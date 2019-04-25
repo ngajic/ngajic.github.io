@@ -60,11 +60,22 @@ Highcharts.chart('container', {
             marker: {
                 enabled: true
             }
-        }
+        },
+		series: {
+			point: {
+				events: {
+					click: function() {
+						window.location.href = this.series.options.website;
+					}
+				}
+			},
+			cursor: 'pointer'
+		}
     },
 
     series: [{
 	    name: 'EddyMataGallos',
+		website: 'https://nv2.fandom.com/wiki/EddyMataGallos',
         data: [
            [Date.UTC(2013, 6, 28), 4621],
            [Date.UTC(2013, 6, 29), 4606],
@@ -466,6 +477,7 @@ Highcharts.chart('container', {
 		]
 	}, {
 		name: 'kkstrong',
+		website: 'https://nv2.fandom.com/wiki/Kkstrong',
 		data: [
            [Date.UTC(2013, 6, 28), 2805],
            [Date.UTC(2013, 6, 29), 3000],
@@ -867,6 +879,7 @@ Highcharts.chart('container', {
 		]
 	}, {
         name: 'VotedStraw',
+		website: 'https://nv2.fandom.com/wiki/VotedStraw',
         data: [
            [Date.UTC(2013, 6, 28), 907],
            [Date.UTC(2013, 6, 29), 986],
@@ -1268,6 +1281,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'Spartax18',
+		website: 'https://nv2.fandom.com/wiki/SpartaX18',
         data: [
            [Date.UTC(2013, 6, 28), null],
            [Date.UTC(2013, 6, 29), null],
@@ -1669,6 +1683,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'oxymoron93',
+		website: 'https://nv2.fandom.com/wiki/Oxymoron93',
         data: [
            [Date.UTC(2013, 6, 28), null],
            [Date.UTC(2013, 6, 29), null],
@@ -2070,6 +2085,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'shomman',
+		website: 'https://nv2.fandom.com/wiki/Shomman',
         data: [
            [Date.UTC(2013, 6, 28), null],
            [Date.UTC(2013, 6, 29), null],
@@ -2471,6 +2487,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'cooperverdon',
+		website: 'https://nv2.fandom.com/wiki/Cooperverdon',
         data: [
            [Date.UTC(2013, 6, 28), null],
            [Date.UTC(2013, 6, 29), null],
@@ -2872,6 +2889,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'jp27ace',
+		website: 'https://nv2.fandom.com/wiki/Jp27ace',
         data: [
            [Date.UTC(2013, 6, 28), 4649],
            [Date.UTC(2013, 6, 29), 4617],
@@ -3273,6 +3291,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'danielr',
+		website: 'https://nv2.fandom.com/wiki/Danielr',
         data: [
            [Date.UTC(2013, 6, 28), 1997],
            [Date.UTC(2013, 6, 29), 2008],
@@ -3674,6 +3693,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'Oleary15',
+		website: 'https://nv2.fandom.com/wiki/Oleary15',
         data: [
            [Date.UTC(2013, 6, 28), null],
            [Date.UTC(2013, 6, 29), null],
@@ -4075,6 +4095,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'White Whale',
+		website: 'https://nv2.fandom.com/wiki/White_Whale',
         data: [
            [Date.UTC(2013, 6, 28), 340],
            [Date.UTC(2013, 6, 29), 331],
@@ -5278,6 +5299,7 @@ Highcharts.chart('container', {
         ]
     }, {
         name: 'swipenet',
+		website: 'https://nv2.fandom.com/wiki/Swipenet',
         data: [
            [Date.UTC(2013, 6, 28), 358],
            [Date.UTC(2013, 6, 29), 451],

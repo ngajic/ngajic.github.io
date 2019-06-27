@@ -14,6 +14,66 @@
 	font-family: uni0553;
 }
 
+header {
+	padding: 10px;
+	background-color: #7a7989;
+	color: #000000;
+	text-align: center;
+	font-family: uni0553;
+}
+
+nav ul {
+	    list-style-type: none;
+		margin: 0;
+}
+
+.aside-link {
+	text-align: center;
+	background-color: #CBCAD0;
+	color: black;
+	font-family: uni0553, 'Times New Roman';	
+	padding: 30px 10px;
+	cursor: pointer;
+}
+
+.aside-link:hover {
+	background-color: #FFFFFF;
+}
+
+#aside-note {
+	margin-left: 50px;
+}
+
+form {
+	text-align: center;
+	margin: 20px;
+}
+
+input {
+	margin: 4px;
+}
+
+header nav ul {
+	display: flex;
+}
+
+main {
+    display: flex;
+}
+
+#about-article {
+	margin: 50px;
+	margin-left: 80px;
+}
+
+aside h2 {
+	font-family: cursive;
+	color: green;
+}
+
+footer {
+	margin-left: 200px;
+}
 .chart_header {
 	background-color: #FFFFFF;
 }
@@ -37,16 +97,14 @@
 	font-size: 15px;
 }
 
-a {
+a.aside-link {
+	display: block;
 	text-decoration: none;
+	width: 200px;
 }
 
 .btn-group button:hover {
 	background-color: #FFFFFF;
-}
-
-#bottom_header {
-	padding: 10px;
 }
 
 #chart_home {

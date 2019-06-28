@@ -25,6 +25,7 @@ header {
 nav ul {
 	    list-style-type: none;
 		margin: 0;
+		padding-left: 0px;
 }
 
 .aside-link {
@@ -68,11 +69,17 @@ main {
 
 aside h2 {
 	font-family: cursive;
+	font-size: 45px;
 	color: green;
 }
 
+#level-history-note {
+	display: block;
+	width: 15%;
+}
+
 footer {
-	margin-left: 200px;
+	margin-left: 15%;
 }
 .chart_header {
 	background-color: #FFFFFF;
@@ -90,13 +97,16 @@ footer {
 	display: block;
 }
 
-#chart_link {
-	color: #000000;
+header a {
 	text-decoration: none;
-	font-family: uni0553, 'Times New Roman';
-	font-size: 15px;
+	/*background-color: #CBCAD0;*/
+	color: black;
+	padding: 20px 20px;
 }
 
+header a:hover {
+	background-color: #FFFFFF;
+}
 a.aside-link {
 	display: block;
 	text-decoration: none;
@@ -105,14 +115,6 @@ a.aside-link {
 
 .btn-group button:hover {
 	background-color: #FFFFFF;
-}
-
-#chart_home {
-	background-color: #7a7989;
-	width: 15%;
-	height: 100px;
-	border-radius: 12px;
-	float: left;
 }
 
 .disabled {

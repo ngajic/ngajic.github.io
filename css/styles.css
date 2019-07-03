@@ -122,11 +122,29 @@ a.aside-link {
 	width: 200px;
 }
 
-.btn-group button:hover {
-	background-color: #FFFFFF;
-}
+@media screen and (max-width: 479px) {
+	main {
+		display: block;
+	}
+	
+	form {
+		width: 90vw;
+	}
+	
+	a.aside-link {
+	width: 100vw;
+	}
 
-.disabled {
-	opacity: 0.6;
-	cursor: not-allowed;
+	.aside-link:hover {
+	  background-color: #FFFFFF;
+	  opacity: 1;
+	}
+
+	nav ul {
+	  background-image: none;
+	}
+	
+	#level-history-note {
+		width: 100vw;
+	}
 }

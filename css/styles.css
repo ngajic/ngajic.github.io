@@ -50,15 +50,13 @@ nav ul {
 
 form {
 	text-align: center;
+	font-family: monospace;
 	margin: 20px;
+	width: 75vw;
 }
 
 input {
-	margin: 4px;
-}
-
-header nav ul {
-	display: flex;
+	margin: 3px;
 }
 
 main {
@@ -117,6 +115,7 @@ header ul li a {
 header ul li a:hover {
 	background-color: #FFFFFF;
 }
+
 a.aside-link {
 	display: block;
 	text-decoration: none;

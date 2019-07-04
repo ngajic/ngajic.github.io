@@ -42,7 +42,6 @@ nav ul {
 }
 
 .aside-link:hover {
-	/*background-color: #FFFFFF;*/
 	opacity: 0;
 }
 
@@ -126,20 +125,37 @@ a.aside-link {
 		width: 90vw;
 	}
 	
+	footer {
+		font-weight: bold;
+	}
+	
+	header nav ul li {
+		display: block;
+	}
+	
+	header nav ul li a {
+		width: 100%;
+	}
+	
 	a.aside-link {
-	width: 100vw;
+		width: 100vw;
 	}
 
 	.aside-link:hover {
-	  background-color: #FFFFFF;
-	  opacity: 1;
+		background-color: #FFFFFF;
+		opacity: 1;
 	}
 
 	nav ul {
-	  background-image: none;
+		background-image: none;
 	}
 	
 	#level-history-note {
 		width: 100vw;
 	}
+	
+	#about-article {
+		margin: 10px;
+	}
+	
 }

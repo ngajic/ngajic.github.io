@@ -116,6 +116,8 @@ Highcharts.chart('container', {
 							str = str + 'B' + Number(this.options.x) % 10;
 						else if (Number(this.options.x) > 99)
 							str = str + 'A' + Number(this.options.x) % 10;
+						else if (Number(this.options.x) < 10)
+							str = str + '0' + Number(this.options.x);
 						else
 							str = str + this.options.x;
 						str = str + '-' + this.options.y;

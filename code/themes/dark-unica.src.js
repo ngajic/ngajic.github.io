@@ -1,30 +1,47 @@
 /**
- * @license Highcharts JS v6.0.7 (2018-02-16)
+ * @license Highcharts JS v7.2.0 (2019-09-03)
  *
- * (c) 2009-2017 Torstein Honsi
+ * (c) 2009-2019 Torstein Honsi
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-(function(factory) {
+(function (factory) {
     if (typeof module === 'object' && module.exports) {
+        factory['default'] = factory;
         module.exports = factory;
+    } else if (typeof define === 'function' && define.amd) {
+        define('highcharts/themes/dark-unica', ['highcharts'], function (Highcharts) {
+            factory(Highcharts);
+            factory.Highcharts = Highcharts;
+            return factory;
+        });
     } else {
-        factory(Highcharts);
+        factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
     }
-}(function(Highcharts) {
-    (function(Highcharts) {
-        /**
-         * (c) 2010-2017 Torstein Honsi
+}(function (Highcharts) {
+    var _modules = Highcharts ? Highcharts._modules : {};
+    function _registerModule(obj, path, args, fn) {
+        if (!obj.hasOwnProperty(path)) {
+            obj[path] = fn.apply(null, args);
+        }
+    }
+    _registerModule(_modules, 'themes/dark-unica.js', [_modules['parts/Globals.js']], function (Highcharts) {
+        /* *
          *
-         * License: www.highcharts.com/license
-         * 
-         * Dark theme for Highcharts JS
-         * @author Torstein Honsi
-         */
+         *  (c) 2010-2019 Torstein Honsi
+         *
+         *  License: www.highcharts.com/license
+         *
+         *  Dark theme for Highcharts JS
+         *
+         * */
+
 
         /* global document */
+
         // Load the fonts
+
         Highcharts.createElement('link', {
             href: 'https://fonts.googleapis.com/css?family=Unica+One',
             rel: 'stylesheet',
@@ -33,16 +50,10 @@
 
         Highcharts.theme = {
             colors: ['#2b908f', '#90ee7e', '#f45b5b', '#7798BF', '#aaeeee', '#ff0066',
-                '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'
-            ],
+                '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'],
             chart: {
                 backgroundColor: {
-                    linearGradient: {
-                        x1: 0,
-                        y1: 0,
-                        x2: 1,
-                        y2: 1
-                    },
+                    linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
                     stops: [
                         [0, '#2a2a2b'],
                         [1, '#3e3e40']
@@ -109,7 +120,10 @@
             plotOptions: {
                 series: {
                     dataLabels: {
-                        color: '#B0B0B3'
+                        color: '#F0F0F3',
+                        style: {
+                            fontSize: '13px'
+                        }
                     },
                     marker: {
                         lineColor: '#333'
@@ -126,6 +140,7 @@
                 }
             },
             legend: {
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 itemStyle: {
                     color: '#E0E0E3'
                 },
@@ -134,6 +149,11 @@
                 },
                 itemHiddenStyle: {
                     color: '#606063'
+                },
+                title: {
+                    style: {
+                        color: '#C0C0C0'
+                    }
                 }
             },
             credits: {
@@ -225,19 +245,15 @@
                 rifleColor: '#FFF',
                 trackBackgroundColor: '#404043',
                 trackBorderColor: '#404043'
-            },
-
-            // special colors for some of the
-            legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
-            background2: '#505053',
-            dataLabelsColor: '#B0B0B3',
-            textColor: '#C0C0C0',
-            contrastTextColor: '#F0F0F3',
-            maskColor: 'rgba(255,255,255,0.3)'
+            }
         };
 
         // Apply the theme
         Highcharts.setOptions(Highcharts.theme);
 
-    }(Highcharts));
+    });
+    _registerModule(_modules, 'masters/themes/dark-unica.src.js', [], function () {
+
+
+    });
 }));

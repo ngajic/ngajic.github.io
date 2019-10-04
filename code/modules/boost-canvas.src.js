@@ -1,22 +1,36 @@
 /**
- * @license Highcharts JS v6.0.7 (2018-02-16)
+ * @license Highcharts JS v7.2.0 (2019-09-03)
+ *
  * Boost module
  *
- * (c) 2010-2017 Highsoft AS
+ * (c) 2010-2019 Highsoft AS
  * Author: Torstein Honsi
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-(function(factory) {
+(function (factory) {
     if (typeof module === 'object' && module.exports) {
+        factory['default'] = factory;
         module.exports = factory;
+    } else if (typeof define === 'function' && define.amd) {
+        define('highcharts/modules/boost-canvas', ['highcharts'], function (Highcharts) {
+            factory(Highcharts);
+            factory.Highcharts = Highcharts;
+            return factory;
+        });
     } else {
-        factory(Highcharts);
+        factory(typeof Highcharts !== 'undefined' ? Highcharts : undefined);
     }
-}(function(Highcharts) {
-    (function(H) {
-        /**
+}(function (Highcharts) {
+    var _modules = Highcharts ? Highcharts._modules : {};
+    function _registerModule(obj, path, args, fn) {
+        if (!obj.hasOwnProperty(path)) {
+            obj[path] = fn.apply(null, args);
+        }
+    }
+    _registerModule(_modules, 'modules/boost-canvas.src.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (H, U) {
+        /* *
          * License: www.highcharts.com/license
          * Author: Torstein Honsi, Christer Vasseng
          *
@@ -27,31 +41,44 @@
          * IE9 and IE10.
          */
 
+
+
+        var isNumber = U.isNumber;
+
+
         var win = H.win,
             doc = win.document,
-            noop = function() {},
+            noop = function () {},
             Color = H.Color,
             Series = H.Series,
             seriesTypes = H.seriesTypes,
-            each = H.each,
             extend = H.extend,
             addEvent = H.addEvent,
             fireEvent = H.fireEvent,
-            isNumber = H.isNumber,
             merge = H.merge,
             pick = H.pick,
             wrap = H.wrap,
             CHUNK_SIZE = 50000,
             destroyLoadingDiv;
 
-        H.initCanvasBoost = function() {
+        /**
+         * Initialize the canvas boost.
+         *
+         * @function Highcharts.initCanvasBoost
+         */
+        H.initCanvasBoost = function () {
             if (H.seriesTypes.heatmap) {
-                H.wrap(H.seriesTypes.heatmap.prototype, 'drawPoints', function() {
-                    var ctx = this.getContext();
+                H.wrap(H.seriesTypes.heatmap.prototype, 'drawPoints', function () {
+                    var chart = this.chart,
+                        ctx = this.getContext(),
+                        inverted = this.chart.inverted,
+                        xAxis = this.xAxis,
+                        yAxis = this.yAxis;
+
                     if (ctx) {
 
                         // draw the columns
-                        each(this.points, function(point) {
+                        this.points.forEach(function (point) {
                             var plotY = point.plotY,
                                 shapeArgs,
                                 pointAttr;
@@ -63,17 +90,29 @@
                             ) {
                                 shapeArgs = point.shapeArgs;
 
-
-                                pointAttr = point.series.pointAttribs(point);
-
+                                if (!chart.styledMode) {
+                                    pointAttr = point.series.pointAttribs(point);
+                                } else {
+                                    pointAttr = point.series.colorAttribs(point);
+                                }
 
                                 ctx.fillStyle = pointAttr.fill;
-                                ctx.fillRect(
-                                    shapeArgs.x,
-                                    shapeArgs.y,
-                                    shapeArgs.width,
-                                    shapeArgs.height
-                                );
+
+                                if (inverted) {
+                                    ctx.fillRect(
+                                        yAxis.len - shapeArgs.y + xAxis.left,
+                                        xAxis.len - shapeArgs.x + yAxis.top,
+                                        -shapeArgs.height,
+                                        -shapeArgs.width
+                                    );
+                                } else {
+                                    ctx.fillRect(
+                                        shapeArgs.x + xAxis.left,
+                                        shapeArgs.y + yAxis.top,
+                                        shapeArgs.width,
+                                        shapeArgs.height
+                                    );
+                                }
                             }
                         });
 
@@ -82,7 +121,8 @@
                     } else {
                         this.chart.showLoading(
                             'Your browser doesn\'t support HTML5 canvas, <br>' +
-                            'please use a modern browser');
+                            'please use a modern browser'
+                        );
 
                         // Uncomment this to provide low-level (slow) support in oldIE.
                         // It will cause script errors on charts with more than a few
@@ -98,15 +138,18 @@
                 /**
                  * Create a hidden canvas to draw the graph on. The contents is later
                  * copied over to an SVG image element.
+                 *
+                 * @private
+                 * @function Highcharts.Series#getContext
                  */
-                getContext: function() {
+                getContext: function () {
                     var chart = this.chart,
                         width = chart.chartWidth,
                         height = chart.chartHeight,
                         targetGroup = chart.seriesGroup || this.group,
                         target = this,
                         ctx,
-                        swapXY = function(proceed, x, y, a, b, c, d) {
+                        swapXY = function (proceed, x, y, a, b, c, d) {
                             proceed.call(this, y, x, a, b, c, d);
                         };
 
@@ -121,30 +164,30 @@
                         target.canvas = doc.createElement('canvas');
 
                         target.renderTarget = chart.renderer.image(
-                                '',
-                                0,
-                                0,
-                                width,
-                                height
-                            )
+                            '',
+                            0,
+                            0,
+                            width,
+                            height
+                        )
                             .addClass('highcharts-boost-canvas')
                             .add(targetGroup);
 
                         target.ctx = ctx = target.canvas.getContext('2d');
 
                         if (chart.inverted) {
-                            each(['moveTo', 'lineTo', 'rect', 'arc'], function(fn) {
+                            ['moveTo', 'lineTo', 'rect', 'arc'].forEach(function (fn) {
                                 wrap(ctx, fn, swapXY);
                             });
                         }
 
-                        target.boostCopy = function() {
+                        target.boostCopy = function () {
                             target.renderTarget.attr({
                                 href: target.canvas.toDataURL('image/png')
                             });
                         };
 
-                        target.boostClear = function() {
+                        target.boostClear = function () {
                             ctx.clearRect(
                                 0,
                                 0,
@@ -153,9 +196,7 @@
                             );
 
                             if (target === this) {
-                                target.renderTarget.attr({
-                                    href: ''
-                                });
+                                target.renderTarget.attr({ href: '' });
                             }
                         };
 
@@ -191,8 +232,11 @@
 
                 /**
                  * Draw the canvas image inside an SVG image
+                 *
+                 * @private
+                 * @function Highcharts.Series#canvasToSVG
                  */
-                canvasToSVG: function() {
+                canvasToSVG: function () {
                     if (!this.chart.isChartSeriesBoosting()) {
                         if (this.boostCopy || this.chart.boostCopy) {
                             (this.boostCopy || this.chart.boostCopy)();
@@ -204,11 +248,11 @@
                     }
                 },
 
-                cvsLineTo: function(ctx, clientX, plotY) {
+                cvsLineTo: function (ctx, clientX, plotY) {
                     ctx.lineTo(clientX, plotY);
                 },
 
-                renderCanvas: function() {
+                renderCanvas: function () {
                     var series = this,
                         options = series.options,
                         chart = series.chart,
@@ -217,7 +261,8 @@
                         activeBoostSettings = chart.options.boost || {},
                         boostSettings = {
                             timeRendering: activeBoostSettings.timeRendering || false,
-                            timeSeriesProcessing: activeBoostSettings.timeSeriesProcessing || false,
+                            timeSeriesProcessing:
+                                activeBoostSettings.timeSeriesProcessing || false,
                             timeSetup: activeBoostSettings.timeSetup || false
                         },
                         ctx,
@@ -239,8 +284,8 @@
                         cvsDrawPoint = this.cvsDrawPoint,
                         cvsLineTo = options.lineWidth ? this.cvsLineTo : false,
                         cvsMarker = r && r <= 1 ?
-                        this.cvsMarkerSquare :
-                        this.cvsMarkerCircle,
+                            this.cvsMarkerSquare :
+                            this.cvsMarkerCircle,
                         strokeBatch = this.cvsStrokeBatch || 1000,
                         enableMouseTracking = options.enableMouseTracking !== false,
                         lastPoint,
@@ -250,7 +295,7 @@
                         translatedThreshold = yBottom,
                         doFill = this.fill,
                         isRange = series.pointArrayMap &&
-                        series.pointArrayMap.join(',') === 'low,high',
+                            series.pointArrayMap.join(',') === 'low,high',
                         isStacked = !!options.stacking,
                         cropStart = series.cropStart || 0,
                         loadingOptions = chart.options.loading,
@@ -262,15 +307,15 @@
                         maxVal,
                         minI,
                         maxI,
-                        kdIndex,
+                        index,
                         sdata = isStacked ? series.data : (xData || rawData),
                         fillColor = series.fillOpacity ?
-                        new Color(series.color).setOpacity(
-                            pick(options.fillOpacity, 0.75)
-                        ).get() :
-                        series.color,
+                            new Color(series.color).setOpacity(
+                                pick(options.fillOpacity, 0.75)
+                            ).get() :
+                            series.color,
 
-                        stroke = function() {
+                        stroke = function () {
                             if (doFill) {
                                 ctx.fillStyle = fillColor;
                                 ctx.fill();
@@ -281,7 +326,7 @@
                             }
                         },
 
-                        drawPoint = function(clientX, plotY, yBottom, i) {
+                        drawPoint = function (clientX, plotY, yBottom, i) {
                             if (c === 0) {
                                 ctx.beginPath();
 
@@ -293,7 +338,7 @@
                             if (
                                 chart.scroller &&
                                 series.options.className ===
-                                'highcharts-navigator-series'
+                                    'highcharts-navigator-series'
                             ) {
                                 plotY += chart.scroller.top;
                                 if (yBottom) {
@@ -340,15 +385,25 @@
                             };
                         },
 
-                        addKDPoint = function(clientX, plotY, i) {
-                            // Avoid more string concatination than required
-                            kdIndex = clientX + ',' + plotY;
+                        compareX = options.findNearestPointBy === 'x',
 
-                            // The k-d tree requires series points. Reduce the amount of
-                            // points, since the time to build the tree increases
-                            // exponentially.
-                            if (enableMouseTracking && !pointTaken[kdIndex]) {
-                                pointTaken[kdIndex] = true;
+                        xDataFull = (
+                            this.xData ||
+                            this.options.xData ||
+                            this.processedXData ||
+                            false
+                        ),
+
+
+                        addKDPoint = function (clientX, plotY, i) {
+                            // Shaves off about 60ms compared to repeated concatenation
+                            index = compareX ? clientX : clientX + ',' + plotY;
+
+                            // The k-d tree requires series points.
+                            // Reduce the amount of points, since the time to build the
+                            // tree increases exponentially.
+                            if (enableMouseTracking && !pointTaken[index]) {
+                                pointTaken[index] = true;
 
                                 if (chart.inverted) {
                                     clientX = xAxis.len - clientX;
@@ -356,6 +411,7 @@
                                 }
 
                                 points.push({
+                                    x: xDataFull ? xDataFull[cropStart + i] : false,
                                     clientX: clientX,
                                     plotX: clientX,
                                     plotY: plotY,
@@ -365,9 +421,7 @@
                         };
 
                     if (this.renderTarget) {
-                        this.renderTarget.attr({
-                            'href': ''
-                        });
+                        this.renderTarget.attr({ 'href': '' });
                     }
 
                     // If we are zooming out from SVG mode, destroy the graphics
@@ -385,7 +439,7 @@
                     );
 
                     series.markerGroup = series.group;
-                    addEvent(series, 'destroy', function() { // Prevent destroy twice
+                    addEvent(series, 'destroy', function () { // Prevent destroy twice
                         series.markerGroup = null;
                     });
 
@@ -398,12 +452,12 @@
                     }
 
                     // if (this.canvas) {
-                    // 	ctx.clearRect(
-                    // 		0,
-                    // 		0,
-                    // 		this.canvas.width,
-                    // 		this.canvas.height
-                    // 	);
+                    //     ctx.clearRect(
+                    //         0,
+                    //         0,
+                    //         this.canvas.width,
+                    //         this.canvas.height
+                    //     );
                     // }
 
                     if (!this.visible) {
@@ -424,7 +478,7 @@
                                 opacity: 1
                             }
                         });
-                        clearTimeout(destroyLoadingDiv);
+                        H.clearTimeout(destroyLoadingDiv);
                         chart.showLoading('Drawing...');
                         chart.options.loading = loadingOptions; // reset
                     }
@@ -434,7 +488,7 @@
                     }
 
                     // Loop over the points
-                    H.eachAsync(sdata, function(d, i) {
+                    H.eachAsync(sdata, function (d, i) {
                         var x,
                             y,
                             clientX,
@@ -533,15 +587,15 @@
                                             drawPoint(
                                                 clientX,
                                                 hasThreshold ?
-                                                Math.min(
-                                                    plotY,
-                                                    translatedThreshold
-                                                ) : plotY,
+                                                    Math.min(
+                                                        plotY,
+                                                        translatedThreshold
+                                                    ) : plotY,
                                                 hasThreshold ?
-                                                Math.max(
-                                                    yBottom,
-                                                    translatedThreshold
-                                                ) : yBottom,
+                                                    Math.max(
+                                                        yBottom,
+                                                        translatedThreshold
+                                                    ) : yBottom,
                                                 i
                                             );
                                             addKDPoint(clientX, plotY, maxI);
@@ -569,13 +623,14 @@
                         }
 
                         return !chartDestroyed;
-                    }, function() {
+                    }, function () {
                         var loadingDiv = chart.loadingDiv,
                             loadingShown = chart.loadingShown;
+
                         stroke();
 
                         // if (series.boostCopy || series.chart.boostCopy) {
-                        // 	(series.boostCopy || series.chart.boostCopy)();
+                        //     (series.boostCopy || series.chart.boostCopy)();
                         // }
 
                         series.canvasToSVG();
@@ -596,7 +651,7 @@
                                 opacity: 0
                             });
                             chart.loadingShown = false;
-                            destroyLoadingDiv = setTimeout(function() {
+                            destroyLoadingDiv = setTimeout(function () {
                                 if (loadingDiv.parentNode) { // In exporting it is falsy
                                     loadingDiv.parentNode.removeChild(loadingDiv);
                                 }
@@ -609,13 +664,13 @@
 
                         series.buildKDTree();
 
-                        // Don't do async on export, the exportChart, getSVGForExport and
-                        // getSVG methods are not chained for it.
+                    // Don't do async on export, the exportChart, getSVGForExport and
+                    // getSVG methods are not chained for it.
                     }, chart.renderer.forExport ? Number.MAX_VALUE : undefined);
                 }
             });
 
-            seriesTypes.scatter.prototype.cvsMarkerCircle = function(
+            seriesTypes.scatter.prototype.cvsMarkerCircle = function (
                 ctx,
                 clientX,
                 plotY,
@@ -626,7 +681,7 @@
             };
 
             // Rect is twice as fast as arc, should be used for small markers
-            seriesTypes.scatter.prototype.cvsMarkerSquare = function(
+            seriesTypes.scatter.prototype.cvsMarkerSquare = function (
                 ctx,
                 clientX,
                 plotY,
@@ -637,7 +692,7 @@
             seriesTypes.scatter.prototype.fill = true;
 
             if (seriesTypes.bubble) {
-                seriesTypes.bubble.prototype.cvsMarkerCircle = function(
+                seriesTypes.bubble.prototype.cvsMarkerCircle = function (
                     ctx,
                     clientX,
                     plotY,
@@ -656,7 +711,7 @@
             }
 
             extend(seriesTypes.area.prototype, {
-                cvsDrawPoint: function(ctx, clientX, plotY, yBottom, lastPoint) {
+                cvsDrawPoint: function (ctx, clientX, plotY, yBottom, lastPoint) {
                     if (lastPoint && clientX !== lastPoint.clientX) {
                         ctx.moveTo(lastPoint.clientX, lastPoint.yBottom);
                         ctx.lineTo(lastPoint.clientX, lastPoint.plotY);
@@ -670,14 +725,14 @@
             });
 
             extend(seriesTypes.column.prototype, {
-                cvsDrawPoint: function(ctx, clientX, plotY, yBottom) {
+                cvsDrawPoint: function (ctx, clientX, plotY, yBottom) {
                     ctx.rect(clientX - 1, plotY, 1, yBottom - plotY);
                 },
                 fill: true,
                 sampling: true
             });
 
-            H.Chart.prototype.callbacks.push(function(chart) {
+            H.Chart.prototype.callbacks.push(function (chart) {
                 function canvasToSVG() {
                     if (chart.boostCopy) {
                         chart.boostCopy();
@@ -686,9 +741,7 @@
 
                 function clear() {
                     if (chart.renderTarget) {
-                        chart.renderTarget.attr({
-                            href: ''
-                        });
+                        chart.renderTarget.attr({ href: '' });
                     }
 
                     if (chart.canvas) {
@@ -706,5 +759,9 @@
             });
         };
 
-    }(Highcharts));
+    });
+    _registerModule(_modules, 'masters/modules/boost-canvas.src.js', [], function () {
+
+
+    });
 }));

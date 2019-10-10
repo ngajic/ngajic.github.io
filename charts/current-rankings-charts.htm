@@ -1,0 +1,287 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Current rankings</title>
+
+
+		<link rel="stylesheet" type="text/css" href="../css/styles.css">
+	</head>
+	<body>
+	<script src="../code/highcharts.js"></script>
+	<script src="../code/highcharts-more.js"></script>
+	<script src="../code/modules/item-series.js"></script>
+
+
+	<header id="header-timeline">
+		<h1>Welcome to</h1>
+		<h1>Nv2 latest charts</h1>
+
+		<nav>
+		<ul>
+			<li><a href="../index.htm">Home</a></li
+			><li><a href="../about.htm">About</a></li>
+		</ul>
+		</nav>
+	</header>
+
+	<div id="container1" style="min-width: 310px; max-width: 1600px; height: 600px; margin: 0 auto"></div>
+
+		<script type="text/javascript">
+
+Highcharts.chart('container1', {
+	chart: {
+		type: 'column',
+		zoomType: 'xy'
+	},
+	title: {
+		text: '0ths rankings'
+	},
+	subtitle: {
+		text: 'As of Oct 10 2019'
+	},
+	xAxis: {
+		categories: ['swipenet (GM)', 'Polt', 'oxymoron93', 'shomman', 'shilo1122', 'SpartaX18', 'cooperverdon', 'EddyMataGallos', 'V3L0C1T4', 'Oleary15', 'Miller', 'jp27ace', 'Jamza15', 'RenaldoLom', 'danielr', 'VotedStraw', 'White Whale', 'Zapmeister', 'getpucht', 'patfelix', 'tailow', 'Ben Schultz', 'Cineva', 'Rallph82', 'dotone', 'kkstrong', 'l8_Rabbit', 'xela', 'DJ_M', 'Martin1707', 'glupi_zmaj', 'golfkid', 'BtoasterBoy', 'Dawiki', 'Icy-Sole', 'Kool', 'KoopaTroopa', 'Meta_Ing', 'N NinjaPro', 'Ngaged', 'Paradox', 'TheGoose', 'Wain', 'aerodynamic', 'amomentlikethis', 'animalrights', 'grydx2', 'ninja_matt', 'pzylL', 'redwinter', 'studwalker']
+	},
+	yAxis: {
+		min: 0,
+		max: 209,
+		title: {
+			text: '0th count'
+		},
+		stackLabels: {
+			enabled: true,
+			style: {
+				fontWeight: 'bold',
+				color: ( //theme
+					Highcharts.defaultOptions.title.style && Highcharts.defaultOptions.title.style.color) || 'gray'
+			}
+		}
+	},
+	legend: {
+		align: 'right',
+		x: -30,
+		verticalAlign: 'top',
+		y: 25,
+		backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
+		borderColor: '#CCC',
+		borderWidth: 1,
+		shadow: false
+	},
+	tooltip: {
+		headerFormat: '<b>{point.x}</b><br/>',
+		pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+	},
+	plotOptions: {
+		column: {
+			stacking: 'normal',
+			dataLabels: {
+				enabled: false
+			}
+		}
+	},
+	series: [{
+		name: 'Tied',
+		data: [101, 42, 19, 9, 6, 37, 19, 12, 2, 4, 6, 3, 5, 4, 5, 2, 4, 4, 3, 2, 4, 3, 3, 0, 3, 3, 1, 2, 2, 2, 2, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1]
+	}, {
+		name: 'Pure',
+		data: [98, 106, 115, 72, 68, 31, 37, 21, 27, 4, 0, 3, 0, 1, 0, 2, 0, 0, 1, 2, 0, 0, 0, 3, 0, 0, 2, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
+	}]
+})
+		</script><hr>
+	<div id="container2" style="min-width: 310px; max-width: 1200px; height: 600px; margin: 0 auto"></div>
+
+		<script type="text/javascript">
+
+Highcharts.chart('container2', {
+	chart: {
+		type: 'item'
+	},
+	title: {
+		text: 'Pure 0ths rankings'
+	},
+	legend: {
+		labelFormat: '{name} <span style="opacity: 0.4">{y}</span>'
+	},
+	series: [{
+		name: '0ths',
+		keys: ['name', 'y', 'color', 'label'],
+		data: [
+			['oxymoron93', 115, '#BE3075'],
+			['Polt', 106, '#EB001F'],
+			['swipenet',  98, '#64A12D'],
+			['shomman',  72, '#000000'],
+			['shilo1122',  68, '#00DDEE'],
+			['cooperverdon',  37, '#008AC5'],
+			['SpartaX18',  31, '#a83232'],
+			['V3L0C1T4',  27, '#005555'],
+			['EddyMataGallos',  21, '#FFED00'],
+			['Oleary15',   4, '#FFEDAA'],
+			['Rallph82',   3, '#ABCDEF'],
+			['jp27ace',   3, '#bb00bb'],
+			['patfelix',   2, '#888888'],
+			['VotedStraw',   2, '#325ea8'],
+			['l8_Rabbit',   2, '#9a32a8'],
+			['BtoasterBoy',   1, '#00aa00'],
+			['golfkid',   1, '#a83277'],
+			['getpucht',   1, '#32a85f'],
+			['Icy-Sole',   1, '#009EE0'],
+			['RenaldoLom',   1, '#83a832'],
+			['xela',   1, '#BE3075'],
+			['grydx2',   1, '#EB001F'],
+			['ninja_matt',   1, '#64A12D'],
+			['Paradox',   1, '#000000'],
+		],
+		dataLabels: {
+			enabled: false,
+			format: '{point.label}'
+		},
+
+		// Circular options
+		center: ['50%', '88%'],
+		size: '180%',
+		startAngle: -100,
+		endAngle: 100
+	}]
+});
+		</script><hr>
+	<div id="container3" style="min-width: 310px; max-width: 1600px; height: 600px; margin: 0 auto"></div>
+
+		<script type="text/javascript">
+
+Highcharts.chart('container3', {
+	chart: {
+		type: 'column',
+		zoomType: 'xy'
+	},
+	title: {
+		text: 'Top10s and Top5s rankings'
+	},
+	xAxis: {
+		categories: ['shomman', 'oxymoron93', 'EddyMataGallos', 'SpartaX18', 'cooperverdon', 'swipenet', 'Polt', 'jp27ace', 'kkstrong', 'V3L0C1T4', 'VotedStraw', 'shilo1122', 'Cineva', 'Oleary15', 'golfkid', 'tailow', 'danielr', 'White Whale', 'pzylL', 'getpucht']
+	},
+	yAxis: {
+		min: 0,
+		title: {
+			text: 'Top10s and Top5s'
+		},
+		stackLabels: {
+			enabled: true,
+			style: {
+				fontWeight: 'bold',
+				color: ( //theme
+					Highcharts.defaultOptions.title.style && Highcharts.defaultOptions.title.style.color) || 'gray'
+			}
+		}
+	},
+	legend: {
+		align: 'right',
+		x: -30,
+		verticalAlign: 'top',
+		y: 25,
+		backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
+		borderColor: '#CCC',
+		borderWidth: 1,
+		shadow: false
+	},
+	tooltip: {
+		headerFormat: '<b>{point.x}</b><br/>',
+		pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+	},
+	plotOptions: {
+		column: {
+			stacking: 'normal',
+			dataLabels: {
+				enabled: false
+			}
+		}
+	},
+	series: [{
+		name: 'Non-top5s',
+		data: [130, 177, 189, 28, 42, 33, 25, 165, 168, 88, 77, 3, 55, 74, 53, 61, 128, 60, 71, 66]
+	}, {
+		name: 'Top5s',
+		data: [406, 340, 332, 221, 220, 219, 189, 105, 101, 94, 74, 71, 68, 63, 49, 48, 45, 32, 31, 25]
+	}]
+})
+		</script><hr>
+	<div id="container4" style="min-width: 310px; max-width: 1400px; height: 800px; margin: 0 auto"></div>
+
+		<script type="text/javascript">
+
+Highcharts.chart('container4', {
+	chart: {
+		type: 'bubble',
+		plotBorderWidth: 1,
+		zoomType: 'xy'
+	},
+	legend: {
+		enabled: false
+	},
+	title: {
+		text: 'Points ranking'
+	},
+	xAxis: {
+		gridLineWidth: 1,
+		title: {
+			text: 'Number of Top10 scores'
+		},
+		labels: {
+			format: '{value}'
+		}
+	},
+	yAxis: {
+		startOnTick: false,
+		endOnTick: false,
+		title: {
+			text: 'Average score'
+		},
+		labels: {
+			format: '{value}'
+		},
+		maxPadding: 0.2
+	},
+	tooltip: {
+		useHTML: true,
+		headerFormat: '<table>',
+		pointFormat: '<tr><th colspan="2"><h3>{point.name}</h3></th></tr>' + '<tr><th>Top10s:</th><td>{point.x}</td></tr>' + '<tr><th>Average score:</th><td>{point.y}</td></tr>' + '<tr><th>Points:</th><td>{point.z}</td></tr>',
+		footerFormat: '</table>',
+		followPointer: true
+	},
+	plotOptions: {
+		series: {
+			dataLabels: {
+				enabled: false,
+				format: '{point.name}'
+			}
+		}
+	},
+	series: [{
+		data: [
+			{ x: 536, y: 3.110075, z: 3693, name: 'shomman' },
+			{ x: 517, y: 3.276596, z: 3476, name: 'oxymoron93' },
+			{ x: 521, y: 3.838772, z: 3210, name: 'EddyMataGallos' },
+			{ x: 252, y: 1.773810, z: 2073, name: 'swipenet' },
+			{ x: 262, y: 2.530534, z: 1957, name: 'cooperverdon' },
+			{ x: 249, y: 2.144578, z: 1956, name: 'SpartaX18' },
+			{ x: 214, y: 1.453271, z: 1829, name: 'Polt' },
+			{ x: 270, y: 5.474074, z: 1222, name: 'jp27ace' },
+			{ x: 269, y: 5.535316, z: 1201, name: 'kkstrong' },
+			{ x: 182, y: 4.043956, z: 1084, name: 'V3L0C1T4' },
+			{ x: 151, y: 4.642384, z:  809, name: 'VotedStraw' },
+			{ x: 123, y: 4.170732, z:  717, name: 'Cineva' },
+			{ x:  74, y: 0.324324, z:  716, name: 'shilo1122' },
+			{ x: 173, y: 5.895954, z:  710, name: 'danielr' },
+			{ x: 137, y: 5.102190, z:  671, name: 'Oleary15' },
+			{ x: 102, y: 4.519608, z:  559, name: 'golfkid' },
+			{ x: 109, y: 5.082569, z:  536, name: 'tailow' },
+			{ x: 146, y: 6.801370, z:  467, name: 'Icy-Sole' },
+			{ x: 134, y: 6.634328, z:  451, name: 'patfelix' },
+			{ x: 102, y: 5.725490, z:  436, name: 'pzylL' },
+]
+	}]
+});
+		</script>
+	</body>
+</html>

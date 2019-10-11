@@ -159,7 +159,7 @@ Highcharts.chart('container3', {
 		text: 'Top10s and Top5s rankings'
 	},
 	xAxis: {
-		categories: ['shomman', 'oxymoron93', 'EddyMataGallos', 'SpartaX18', 'cooperverdon', 'swipenet', 'Polt', 'jp27ace', 'kkstrong', 'V3L0C1T4', 'VotedStraw', 'shilo1122', 'Cineva', 'Oleary15', 'golfkid', 'tailow', 'danielr', 'White Whale', 'pzylL', 'getpucht']
+		categories: ['shomman', 'EddyMataGallos', 'oxymoron93', 'jp27ace', 'kkstrong', 'cooperverdon', 'swipenet', 'SpartaX18', 'Polt', 'V3L0C1T4', 'danielr', 'VotedStraw', 'Icy-Sole', 'Oleary15', 'patfelix', 'Cineva', 'BtoasterBoy', 'tailow', 'golfkid', 'pzylL']
 	},
 	yAxis: {
 		min: 0,
@@ -199,10 +199,10 @@ Highcharts.chart('container3', {
 	},
 	series: [{
 		name: 'Non-top5s',
-		data: [130, 177, 189, 28, 42, 33, 25, 165, 168, 88, 77, 3, 55, 74, 53, 61, 128, 60, 71, 66]
+		data: [130, 189, 177, 165, 168, 42, 33, 28, 25, 88, 128, 77, 129, 74, 111, 55, 96, 61, 53, 71]
 	}, {
 		name: 'Top5s',
-		data: [406, 340, 332, 221, 220, 219, 189, 105, 101, 94, 74, 71, 68, 63, 49, 48, 45, 32, 31, 25]
+		data: [406, 332, 340, 105, 101, 220, 219, 221, 189, 94, 45, 74, 17, 63, 23, 68, 13, 48, 49, 31]
 	}]
 })
 		</script><hr>
@@ -240,7 +240,8 @@ Highcharts.chart('container4', {
 		labels: {
 			format: '{value}'
 		},
-		maxPadding: 0.2
+		maxPadding: 0.2,
+		reversed: true
 	},
 	tooltip: {
 		useHTML: true,

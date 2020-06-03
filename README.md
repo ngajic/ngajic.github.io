@@ -6,4 +6,6 @@ This repository is used for storing files associated with highscoring in **Nv2.0
 
 I am using **Highcharts**' .js files to present charts. Code and many examples for it are available at their GitHub account: [*Highcharts.*](https://github.com/highcharts/highcharts)
 
-*Many charts are present now, from score files dating way back in the beginning of Nv2.0 highscoring. Score files were gathered from different sides thanks to Eddy's *N2High3.0*
+Score files were gathered from different sides thanks to Eddy's *N2High3.0* and organized per year of creation. [*GitZip*](https://kinolien.github.io/gitzip) is authorized to work with this repo, so score files can be easily downloaded as zip bundles.
+
+I was influenced by similar work of Hendor and zapkt.

@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * (c) 2009-2019 Highsoft AS
  *
@@ -26,10 +26,10 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'themes/high-contrast-dark.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'themes/high-contrast-dark.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (Highcharts, U) {
         /* *
          *
-         *  (c) 2010-2019 Highsoft AS
+         *  (c) 2010-2020 Highsoft AS
          *
          *  Author: Øystein Moseng
          *
@@ -38,12 +38,12 @@
          *  Accessible high-contrast dark theme for Highcharts. Specifically tailored
          *  towards 3:1 contrast against black/off-black backgrounds. Neighboring
          *  colors are tested for color blindness.
+         *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
+        var setOptions = U.setOptions;
         var textBright = '#F0F0F3';
-
         Highcharts.theme = {
             colors: [
                 '#a6f0ff',
@@ -57,24 +57,20 @@
                 '#dadfe1',
                 '#a0618b'
             ],
-
             chart: {
                 backgroundColor: '#1f1f20',
                 plotBorderColor: '#606063'
             },
-
             title: {
                 style: {
                     color: textBright
                 }
             },
-
             subtitle: {
                 style: {
                     color: textBright
                 }
             },
-
             xAxis: {
                 gridLineColor: '#707073',
                 labels: {
@@ -88,11 +84,9 @@
                 title: {
                     style: {
                         color: textBright
-
                     }
                 }
             },
-
             yAxis: {
                 gridLineColor: '#707073',
                 labels: {
@@ -109,14 +103,12 @@
                     }
                 }
             },
-
             tooltip: {
                 backgroundColor: 'rgba(0, 0, 0, 0.85)',
                 style: {
                     color: textBright
                 }
             },
-
             plotOptions: {
                 series: {
                     dataLabels: {
@@ -139,7 +131,6 @@
                     nullColor: '#353535'
                 }
             },
-
             legend: {
                 backgroundColor: 'transparent',
                 itemStyle: {
@@ -157,19 +148,16 @@
                     }
                 }
             },
-
             credits: {
                 style: {
                     color: textBright
                 }
             },
-
             labels: {
                 style: {
                     color: '#707073'
                 }
             },
-
             drilldown: {
                 activeAxisLabelStyle: {
                     color: textBright
@@ -178,7 +166,6 @@
                     color: textBright
                 }
             },
-
             navigation: {
                 buttonOptions: {
                     symbolStroke: '#DDDDDD',
@@ -187,7 +174,6 @@
                     }
                 }
             },
-
             rangeSelector: {
                 buttonTheme: {
                     fill: '#505053',
@@ -221,7 +207,6 @@
                     color: textBright
                 }
             },
-
             navigator: {
                 handles: {
                     backgroundColor: '#666',
@@ -237,7 +222,6 @@
                     gridLineColor: '#505053'
                 }
             },
-
             scrollbar: {
                 barBackgroundColor: '#808083',
                 barBorderColor: '#808083',
@@ -249,9 +233,8 @@
                 trackBorderColor: '#404043'
             }
         };
-
         // Apply the theme
-        Highcharts.setOptions(Highcharts.theme);
+        setOptions(Highcharts.theme);
 
     });
     _registerModule(_modules, 'masters/themes/high-contrast-dark.src.js', [], function () {

@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * (c) 2009-2019 Torstein Honsi
  *
@@ -26,35 +26,32 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'themes/sand-signika.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'themes/sand-signika.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (Highcharts, U) {
         /* *
          *
-         *  (c) 2010-2019 Torstein Honsi
+         *  (c) 2010-2020 Torstein Honsi
          *
          *  License: www.highcharts.com/license
          *
          *  Sand-Signika theme for Highcharts JS
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
         /* global document */
-
-
+        var setOptions = U.setOptions;
         // Load the fonts
         Highcharts.createElement('link', {
             href: 'https://fonts.googleapis.com/css?family=Signika:400,700',
             rel: 'stylesheet',
             type: 'text/css'
         }, null, document.getElementsByTagName('head')[0]);
-
         // Add the background image to the container
         Highcharts.addEvent(Highcharts.Chart, 'afterGetContainer', function () {
+            // eslint-disable-next-line no-invalid-this
             this.container.style.background =
                 'url(https://www.highcharts.com/samples/graphics/sand.png)';
         });
-
-
         Highcharts.theme = {
             colors: ['#f45b5b', '#8085e9', '#8d4654', '#7798BF', '#aaeeee',
                 '#ff0066', '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'],
@@ -116,7 +113,6 @@
                     shadow: false
                 }
             },
-
             // Highstock specific
             navigator: {
                 xAxis: {
@@ -138,11 +134,9 @@
             scrollbar: {
                 trackBorderColor: '#C0C0C8'
             }
-
         };
-
         // Apply the theme
-        Highcharts.setOptions(Highcharts.theme);
+        setOptions(Highcharts.theme);
 
     });
     _registerModule(_modules, 'masters/themes/sand-signika.src.js', [], function () {

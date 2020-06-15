@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * Highcharts funnel module
  *
@@ -28,12 +28,12 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'modules/funnel3d.src.js', [_modules['parts/Globals.js']], function (H) {
+    _registerModule(_modules, 'modules/funnel3d.src.js', [_modules['parts/Globals.js'], _modules['parts/Color.js'], _modules['parts/Utilities.js']], function (H, Color, U) {
         /* *
          *
          *  Highcharts funnel3d series module
          *
-         *  (c) 2010-2019 Highsoft AS
+         *  (c) 2010-2020 Highsoft AS
          *
          *  Author: Kacper Madej
          *
@@ -42,18 +42,21 @@
          *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
          *
          * */
-        var charts = H.charts, color = H.color, error = H.error, extend = H.extend, merge = H.merge, pick = H.pick, seriesType = H.seriesType, seriesTypes = H.seriesTypes, relativeLength = H.relativeLength, 
-        // Use H.Renderer instead of H.SVGRenderer for VML support.
+        var color = Color.parse;
+        var error = U.error, extend = U.extend, merge = U.merge, pick = U.pick, relativeLength = U.relativeLength, seriesType = U.seriesType;
+        var charts = H.charts, seriesTypes = H.seriesTypes, 
+        // Use H.Renderer instead of SVGRenderer for VML support.
         RendererProto = H.Renderer.prototype, 
         //
         cuboidPath = RendererProto.cuboidPath, funnel3dMethods;
         /**
          * The funnel3d series type.
          *
-         * Requires `highcharts-3d.js`, `cylinder.js` and `funnel3d.js` module.
-         *
          * @constructor seriesTypes.funnel3d
          * @augments seriesTypes.column
+         * @requires highcharts-3d
+         * @requires modules/cylinder
+         * @requires modules/funnel3d
          */
         seriesType('funnel3d', 'column', 
         /**
@@ -68,9 +71,13 @@
          *         Funnel3d
          *
          * @extends      plotOptions.column
-         * @excluding    allAreas, boostThreshold, colorAxis, compare, compareBase
+         * @excluding    allAreas, boostThreshold, colorAxis, compare, compareBase,
+         *               dataSorting
          * @product      highcharts
          * @since        7.1.0
+         * @requires     highcharts-3d
+         * @requires     modules/cylinder
+         * @requires     modules/funnel3d
          * @optionparent plotOptions.funnel3d
          */
         {
@@ -133,17 +140,10 @@
             edgeWidth: 0,
             colorByPoint: true,
             showInLegend: false,
-            /**
-             * @default {"align": "right", "crop": false, "inside": false, "overflow": "allow"}
-             */
             dataLabels: {
-                /** @ignore-option */
                 align: 'right',
-                /** @ignore-option */
                 crop: false,
-                /** @ignore-option */
                 inside: false,
-                /** @ignore-option */
                 overflow: 'allow'
             }
         }, {
@@ -329,17 +329,26 @@
                 seriesTypes.column.prototype.alignDataLabel.apply(series, arguments);
             }
         }, /** @lends seriesTypes.funnel3d.prototype.pointClass.prototype */ {
-            shapeType: 'funnel3d'
+            shapeType: 'funnel3d',
+            hasNewShapeType: H
+                .seriesTypes.column.prototype
+                .pointClass.prototype
+                .hasNewShapeType
         });
         /**
          * A `funnel3d` series. If the [type](#series.funnel3d.type) option is
          * not specified, it is inherited from [chart.type](#chart.type).
          *
+         * @sample {highcharts} highcharts/demo/funnel3d/
+         *         Funnel3d demo
+         *
          * @since     7.1.0
          * @extends   series,plotOptions.funnel3d
          * @excluding allAreas,boostThreshold,colorAxis,compare,compareBase
          * @product   highcharts
-         * @sample    {highcharts} highcharts/demo/funnel3d/ Funnel3d demo
+         * @requires  highcharts-3d
+         * @requires  modules/cylinder
+         * @requires  modules/funnel3d
          * @apioption series.funnel3d
          */
         /**
@@ -397,7 +406,7 @@
          * @product   highcharts
          * @apioption series.funnel3d.data.gradientForSides
          */
-        funnel3dMethods = H.merge(RendererProto.elements3d.cuboid, {
+        funnel3dMethods = merge(RendererProto.elements3d.cuboid, {
             parts: [
                 'top', 'bottom',
                 'frontUpper', 'backUpper',
@@ -640,16 +649,16 @@
             alphaCorrection = shapeArgs.alphaCorrection = 90 -
                 Math.abs((chart.options.chart.options3d.alpha % 180) - 90), 
             // set zIndexes of parts based on cubiod logic, for consistency
-            cuboidData = cuboidPath.call(renderer, H.merge(shapeArgs, {
+            cuboidData = cuboidPath.call(renderer, merge(shapeArgs, {
                 depth: shapeArgs.width,
                 width: (shapeArgs.width + shapeArgs.bottom.width) / 2
             })), isTopFirst = cuboidData.isTop, isFrontFirst = !cuboidData.isFront, hasMiddle = !!shapeArgs.middle, 
             //
-            top = renderer.getCylinderEnd(chart, H.merge(shapeArgs, {
+            top = renderer.getCylinderEnd(chart, merge(shapeArgs, {
                 x: shapeArgs.x - shapeArgs.width / 2,
                 z: shapeArgs.z - shapeArgs.width / 2,
                 alphaCorrection: alphaCorrection
-            })), bottomWidth = shapeArgs.bottom.width, bottomArgs = H.merge(shapeArgs, {
+            })), bottomWidth = shapeArgs.bottom.width, bottomArgs = merge(shapeArgs, {
                 width: bottomWidth,
                 x: shapeArgs.x - bottomWidth / 2,
                 z: shapeArgs.z - bottomWidth / 2,
@@ -661,7 +670,7 @@
             useAlphaCorrection;
             if (hasMiddle) {
                 middleWidth = shapeArgs.middle.width;
-                middleTopArgs = H.merge(shapeArgs, {
+                middleTopArgs = merge(shapeArgs, {
                     y: shapeArgs.y + shapeArgs.middle.fraction * shapeArgs.height,
                     width: middleWidth,
                     x: shapeArgs.x - middleWidth / 2,
@@ -686,23 +695,23 @@
             ret.backUpper = renderer.getCylinderBack(top, middleTop);
             useAlphaCorrection = (Math.min(middleWidth, shapeArgs.width) /
                 Math.max(middleWidth, shapeArgs.width)) !== 1;
-            ret.rightUpper = renderer.getCylinderFront(renderer.getCylinderEnd(chart, H.merge(shapeArgs, {
+            ret.rightUpper = renderer.getCylinderFront(renderer.getCylinderEnd(chart, merge(shapeArgs, {
                 x: shapeArgs.x - shapeArgs.width / 2,
                 z: shapeArgs.z - shapeArgs.width / 2,
                 alphaCorrection: useAlphaCorrection ? -alphaCorrection : 0
-            }), false), renderer.getCylinderEnd(chart, H.merge(middleTopArgs, {
+            }), false), renderer.getCylinderEnd(chart, merge(middleTopArgs, {
                 alphaCorrection: useAlphaCorrection ? -alphaCorrection : 0
             }), !hasMiddle));
             if (hasMiddle) {
                 useAlphaCorrection = (Math.min(middleWidth, bottomWidth) /
                     Math.max(middleWidth, bottomWidth)) !== 1;
-                H.merge(true, ret, {
+                merge(true, ret, {
                     frontLower: renderer.getCylinderFront(middleBottom, bottom),
                     backLower: renderer.getCylinderBack(middleBottom, bottom),
-                    rightLower: renderer.getCylinderFront(renderer.getCylinderEnd(chart, H.merge(bottomArgs, {
+                    rightLower: renderer.getCylinderFront(renderer.getCylinderEnd(chart, merge(bottomArgs, {
                         alphaCorrection: useAlphaCorrection ?
                             -alphaCorrection : 0
-                    }), true), renderer.getCylinderEnd(chart, H.merge(middleTopArgs, {
+                    }), true), renderer.getCylinderEnd(chart, merge(middleTopArgs, {
                         alphaCorrection: useAlphaCorrection ?
                             -alphaCorrection : 0
                     }), false)),

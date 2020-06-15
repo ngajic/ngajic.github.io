@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * Item series type for Highcharts
  *
@@ -28,10 +28,10 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'modules/item-series.src.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (H, U) {
+    _registerModule(_modules, 'modules/item-series.src.js', [_modules['parts/Globals.js'], _modules['parts/Options.js'], _modules['parts/Utilities.js']], function (H, O, U) {
         /* *
          *
-         *  (c) 2019 Torstein Honsi
+         *  (c) 2020 Torstein Honsi
          *
          *  Item series type for Highcharts
          *
@@ -40,8 +40,9 @@
          *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
          *
          * */
-        var defined = U.defined, isNumber = U.isNumber, objectEach = U.objectEach;
-        var extend = H.extend, fireEvent = H.fireEvent, merge = H.merge, piePoint = H.seriesTypes.pie.prototype.pointClass.prototype;
+        var defaultOptions = O.defaultOptions;
+        var defined = U.defined, extend = U.extend, fireEvent = U.fireEvent, isNumber = U.isNumber, merge = U.merge, objectEach = U.objectEach, pick = U.pick, seriesType = U.seriesType;
+        var piePoint = H.seriesTypes.pie.prototype.pointClass.prototype;
         /**
          * The item series type.
          *
@@ -53,7 +54,7 @@
          *
          * @augments Highcharts.seriesTypes.pie
          */
-        H.seriesType('item', 
+        seriesType('item', 
         // Inherits pie as the most tested non-cartesian series with individual
         // point legend, tooltips etc. Only downside is we need to re-enable
         // marker options.
@@ -80,6 +81,7 @@
          * @product      highcharts
          * @excluding    borderColor, borderWidth, depth, linecap, shadow,
          *               slicedOffset
+         * @requires     modules/item-series
          * @optionparent plotOptions.item
          */
         {
@@ -91,7 +93,7 @@
              *         Parliament chart
              * @type {undefined|number}
              */
-            endAngle: undefined,
+            endAngle: void 0,
             /**
              * In circular view, the size of the inner diameter of the circle. Can
              * be a percentage or pixel value. Percentages are relative to the outer
@@ -121,7 +123,7 @@
             /**
              * @extends plotOptions.series.marker
              */
-            marker: merge(H.defaultOptions.plotOptions.line.marker, {
+            marker: merge(defaultOptions.plotOptions.line.marker, {
                 radius: null
             }),
             /**
@@ -132,7 +134,8 @@
              *         Fixed row count
              * @type {number}
              */
-            rows: undefined,
+            rows: void 0,
+            crisp: false,
             showInLegend: true,
             /**
              * In circular view, the start angle of the item layout, in degrees
@@ -142,17 +145,22 @@
              *         Parliament chart
              * @type {undefined|number}
              */
-            startAngle: undefined
+            startAngle: void 0
         }, 
         // Prototype members
         {
-            translate: function () {
+            markerAttribs: void 0,
+            translate: function (positions) {
+                // Initialize chart without setting data, #13379.
+                if (this.total === 0) {
+                    this.center = this.getCenter();
+                }
                 if (!this.slots) {
                     this.slots = [];
                 }
                 if (isNumber(this.options.startAngle) &&
                     isNumber(this.options.endAngle)) {
-                    H.seriesTypes.pie.prototype.translate.call(this);
+                    H.seriesTypes.pie.prototype.translate.apply(this, arguments);
                     this.slots = this.getSlots();
                 }
                 else {
@@ -164,9 +172,9 @@
             getSlots: function () {
                 var center = this.center, diameter = center[2], innerSize = center[3], row, slots = this.slots, x, y, rowRadius, rowLength, colCount, increment, angle, col, itemSize = 0, rowCount, fullAngle = (this.endAngleRad - this.startAngleRad), itemCount = Number.MAX_VALUE, finalItemCount, rows, testRows, rowsOption = this.options.rows, 
                 // How many rows (arcs) should be used
-                rowFraction = (diameter - innerSize) / diameter;
+                rowFraction = (diameter - innerSize) / diameter, isCircle = fullAngle % (2 * Math.PI) === 0;
                 // Increase the itemSize until we find the best fit
-                while (itemCount > this.total) {
+                while (itemCount > this.total + (rows && isCircle ? rows.length : 0)) {
                     finalItemCount = itemCount;
                     // Reset
                     slots.length = 0;
@@ -214,7 +222,8 @@
                 // the rows and remove the last slot until the count is correct.
                 // For each iteration we sort the last slot by the angle, and
                 // remove those with the highest angles.
-                var overshoot = finalItemCount - this.total;
+                var overshoot = finalItemCount - this.total -
+                    (isCircle ? rows.length : 0);
                 /**
                  * @private
                  * @param {Highcharts.ItemRowContainerObject} item
@@ -306,7 +315,7 @@
                 //*/
                 this.points.forEach(function (point) {
                     var attr, graphics, pointAttr, pointMarkerOptions = point.marker || {}, symbol = (pointMarkerOptions.symbol ||
-                        seriesMarkerOptions.symbol), r = H.pick(pointMarkerOptions.radius, seriesMarkerOptions.radius), size = defined(r) ? 2 * r : itemSize, padding = size * options.itemPadding, x, y, width, height;
+                        seriesMarkerOptions.symbol), r = pick(pointMarkerOptions.radius, seriesMarkerOptions.radius), size = defined(r) ? 2 * r : itemSize, padding = size * options.itemPadding, x, y, width, height;
                     point.graphics = graphics = point.graphics || {};
                     if (!series.chart.styledMode) {
                         pointAttr = series.pointAttribs(point, point.selected && 'select');
@@ -346,7 +355,7 @@
                                 width: width,
                                 height: height
                             };
-                            if (r !== undefined) {
+                            if (typeof r !== 'undefined') {
                                 attr.r = r;
                             }
                             if (graphics[val]) {
@@ -398,7 +407,6 @@
                     this.group.animate({
                         opacity: 1
                     }, this.options.animation);
-                    this.animate = null;
                 }
             }
         }, 
@@ -414,8 +422,9 @@
          * it is inherited from [chart.type](#chart.type).
          *
          * @extends   series,plotOptions.item
-         * @excluding dataParser, dataURL, stack, xAxis, yAxis
+         * @excluding dataParser, dataURL, stack, xAxis, yAxis, dataSorting
          * @product   highcharts
+         * @requires  modules/item-series
          * @apioption series.item
          */
         /**

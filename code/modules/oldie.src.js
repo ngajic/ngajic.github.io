@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * Old IE (v6, v7, v8) module for Highcharts v6+.
  *
@@ -29,20 +29,22 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'modules/oldie.src.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (H, U) {
+    _registerModule(_modules, 'modules/oldie.src.js', [_modules['parts/Chart.js'], _modules['parts/Color.js'], _modules['parts/Globals.js'], _modules['parts/Pointer.js'], _modules['parts/SVGElement.js'], _modules['parts/SVGRenderer.js'], _modules['parts/Utilities.js']], function (Chart, Color, H, Pointer, SVGElement, SVGRenderer, U) {
         /* *
          *
-         *  (c) 2010-2019 Torstein Honsi
+         *  (c) 2010-2020 Torstein Honsi
          *
          *  License: www.highcharts.com/license
          *
-         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
-         *
          *  Support for old IE browsers (6, 7 and 8) in Highcharts v6+.
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-        var defined = U.defined, erase = U.erase, isArray = U.isArray, isNumber = U.isNumber, isObject = U.isObject, pInt = U.pInt;
-        var VMLRenderer, VMLRendererExtension, VMLElement, Chart = H.Chart, createElement = H.createElement, css = H.css, deg2rad = H.deg2rad, discardElement = H.discardElement, doc = H.doc, extend = H.extend, extendClass = H.extendClass, merge = H.merge, noop = H.noop, pick = H.pick, svg = H.svg, SVGElement = H.SVGElement, SVGRenderer = H.SVGRenderer, win = H.win;
+        var color = Color.parse;
+        var deg2rad = H.deg2rad, doc = H.doc, noop = H.noop, svg = H.svg, win = H.win;
+        var addEvent = U.addEvent, createElement = U.createElement, css = U.css, defined = U.defined, discardElement = U.discardElement, erase = U.erase, extend = U.extend, extendClass = U.extendClass, getOptions = U.getOptions, isArray = U.isArray, isNumber = U.isNumber, isObject = U.isObject, merge = U.merge, offset = U.offset, pick = U.pick, pInt = U.pInt, uniqueKey = U.uniqueKey;
+        var VMLRenderer, VMLRendererExtension, VMLElement;
         /**
          * Path to the pattern image required by VML browsers in order to
          * draw radial gradients.
@@ -50,13 +52,14 @@
          * @type      {string}
          * @default   http://code.highcharts.com/{version}/gfx/vml-radial-gradient.png
          * @since     2.3.0
+         * @requires  modules/oldie
          * @apioption global.VMLRadialGradientURL
          */
-        H.getOptions().global.VMLRadialGradientURL =
-            'http://code.highcharts.com/7.2.0/gfx/vml-radial-gradient.png';
+        getOptions().global.VMLRadialGradientURL =
+            'http://code.highcharts.com/8.1.1/gfx/vml-radial-gradient.png';
         // Utilites
         if (doc && !doc.defaultView) {
-            H.getStyle = function (el, prop) {
+            H.getStyle = U.getStyle = function (el, prop) {
                 var val, alias = {
                     width: 'clientWidth',
                     height: 'clientHeight'
@@ -70,7 +73,7 @@
                 // Getting the rendered width and height
                 if (alias) {
                     el.style.zoom = 1;
-                    return Math.max(el[alias] - 2 * H.getStyle(el, 'padding'), 0);
+                    return Math.max(el[alias] - 2 * U.getStyle(el, 'padding'), 0);
                 }
                 val = el.currentStyle[prop.replace(/\-(\w)/g, function (a, b) {
                     return b.toUpperCase();
@@ -89,7 +92,7 @@
             // This applies only to charts for export, where IE runs the SVGRenderer
             // instead of the VMLRenderer
             // (#1079, #1063)
-            H.addEvent(SVGElement, 'afterInit', function () {
+            addEvent(SVGElement, 'afterInit', function () {
                 if (this.element.nodeName === 'text') {
                     this.css({
                         position: 'absolute'
@@ -106,16 +109,16 @@
              * @param {boolean} [chartPosition=false]
              * @return {Highcharts.PointerEventObject}
              */
-            H.Pointer.prototype.normalize = function (e, chartPosition) {
+            Pointer.prototype.normalize = function (e, chartPosition) {
                 e = e || win.event;
                 if (!e.target) {
                     e.target = e.srcElement;
                 }
                 // Get mouse position
                 if (!chartPosition) {
-                    this.chartPosition = chartPosition = H.offset(this.chart.container);
+                    this.chartPosition = chartPosition = offset(this.chart.container);
                 }
-                return H.extend(e, {
+                return extend(e, {
                     // #2005, #2129: the second case is for IE10 quirks mode within
                     // framesets
                     chartX: Math.round(Math.max(e.x, e.clientX - chartPosition.left)),
@@ -200,7 +203,7 @@
                     }
                     // unique function string (#6746)
                     if (!fn.hcKey) {
-                        fn.hcKey = H.uniqueKey();
+                        fn.hcKey = uniqueKey();
                     }
                     // Link wrapped fn with original fn, so we can get this in
                     // removeEvent
@@ -473,9 +476,9 @@
                 on: function (eventType, handler) {
                     // simplest possible event model for internal use
                     this.element['on' + eventType] = function () {
-                        var evt = win.event;
-                        evt.target = evt.srcElement;
-                        handler(evt);
+                        var e = win.event;
+                        e.target = e.srcElement;
+                        handler(e);
                     };
                     return this;
                 },
@@ -739,6 +742,8 @@
                  */
                 init: function (container, width, height) {
                     var renderer = this, boxWrapper, box, css;
+                    // Extended SVGRenderer member
+                    this.crispPolyLine = SVGRenderer.prototype.crispPolyLine;
                     renderer.alignedObjects = [];
                     boxWrapper = renderer.createElement('div')
                         .css({ position: 'relative' });
@@ -844,20 +849,20 @@
                  *
                  * @return {T}
                  */
-                color: function (color, elem, prop, wrapper) {
+                color: function (colorOption, elem, prop, wrapper) {
                     var renderer = this, colorObject, regexRgba = /^rgba/, markup, fillType, ret = 'none';
                     // Check for linear or radial gradient
-                    if (color &&
-                        color.linearGradient) {
+                    if (colorOption &&
+                        colorOption.linearGradient) {
                         fillType = 'gradient';
                     }
-                    else if (color &&
-                        color.radialGradient) {
+                    else if (colorOption &&
+                        colorOption.radialGradient) {
                         fillType = 'pattern';
                     }
                     if (fillType) {
-                        var stopColor, stopOpacity, gradient = (color.linearGradient ||
-                            color.radialGradient), x1, y1, x2, y2, opacity1, opacity2, color1, color2, fillAttr = '', stops = color.stops, firstStop, lastStop, colors = [], addFillNode = function () {
+                        var stopColor, stopOpacity, gradient = (colorOption.linearGradient ||
+                            colorOption.radialGradient), x1, y1, x2, y2, opacity1, opacity2, color1, color2, fillAttr = '', stops = colorOption.stops, firstStop, lastStop, colors = [], addFillNode = function () {
                             // Add the fill subnode. When colors attribute is used,
                             // the meanings of opacity and o:opacity2 are reversed.
                             markup = ['<fill colors="' + colors.join(',') +
@@ -884,7 +889,7 @@
                         // Compute the stops
                         stops.forEach(function (stop, i) {
                             if (regexRgba.test(stop[1])) {
-                                colorObject = H.color(stop[1]);
+                                colorObject = color(stop[1]);
                                 stopColor = colorObject.get('rgb');
                                 stopOpacity = colorObject.get('a');
                             }
@@ -931,7 +936,7 @@
                                         sizey *= radialReference[2] / bBox.height;
                                     }
                                     fillAttr =
-                                        'src="' + H.getOptions().global.VMLRadialGradientURL +
+                                        'src="' + getOptions().global.VMLRadialGradientURL +
                                             '" ' +
                                             'size="' + sizex + ',' + sizey + '" ' +
                                             'origin="0.5,0.5" ' +
@@ -962,8 +967,8 @@
                         // If the color is an rgba color, split it and add a fill node
                         // to hold the opacity component
                     }
-                    else if (regexRgba.test(color) && elem.tagName !== 'IMG') {
-                        colorObject = H.color(color);
+                    else if (regexRgba.test(colorOption) && elem.tagName !== 'IMG') {
+                        colorObject = color(colorOption);
                         wrapper[prop + '-opacitySetter'](colorObject.get('a'), prop, elem);
                         ret = colorObject.get('rgb');
                     }
@@ -974,7 +979,7 @@
                             propNodes[0].opacity = 1;
                             propNodes[0].type = 'solid';
                         }
-                        ret = color;
+                        ret = colorOption;
                     }
                     return ret;
                 },

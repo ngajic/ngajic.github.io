@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * (c) 2009-2019 Highsoft AS
  *
@@ -26,10 +26,10 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'themes/avocado.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'themes/avocado.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (Highcharts, U) {
         /* *
          *
-         *  (c) 2010-2019 Highsoft AS
+         *  (c) 2010-2020 Highsoft AS
          *
          *  Author: Øystein Moseng
          *
@@ -38,24 +38,21 @@
          *  Accessible high-contrast theme for Highcharts. Considers colorblindness and
          *  monochrome rendering.
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
+        var setOptions = U.setOptions;
         Highcharts.theme = {
             colors: ['#F3E796', '#95C471', '#35729E', '#251735'],
-
             colorAxis: {
                 maxColor: '#05426E',
                 minColor: '#F3E796'
             },
-
             plotOptions: {
                 map: {
-                    nullColor: '#fcfefe'
+                    nullColor: '#FCFEFE'
                 }
             },
-
             navigator: {
                 maskFill: 'rgba(170, 205, 170, 0.5)',
                 series: {
@@ -64,9 +61,8 @@
                 }
             }
         };
-
         // Apply the theme
-        Highcharts.setOptions(Highcharts.theme);
+        setOptions(Highcharts.theme);
 
     });
     _registerModule(_modules, 'masters/themes/avocado.src.js', [], function () {

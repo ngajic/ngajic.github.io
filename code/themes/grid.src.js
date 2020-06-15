@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * (c) 2009-2019 Torstein Honsi
  *
@@ -26,19 +26,19 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'themes/grid.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'themes/grid.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (Highcharts, U) {
         /* *
          *
-         *  (c) 2010-2019 Torstein Honsi
+         *  (c) 2010-2020 Torstein Honsi
          *
          *  License: www.highcharts.com/license
          *
          *  Grid theme for Highcharts JS
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
+        var setOptions = U.setOptions;
         Highcharts.theme = {
             colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572',
                 '#FF9655', '#FFF263', '#6AF9C4'],
@@ -83,7 +83,6 @@
                         fontWeight: 'bold',
                         fontSize: '12px',
                         fontFamily: 'Trebuchet MS, Verdana, sans-serif'
-
                     }
                 }
             },
@@ -112,7 +111,6 @@
                 itemStyle: {
                     font: '9pt Trebuchet MS, Verdana, sans-serif',
                     color: 'black'
-
                 },
                 itemHoverStyle: {
                     color: '#039'
@@ -126,7 +124,6 @@
                     color: '#99b'
                 }
             },
-
             navigation: {
                 buttonOptions: {
                     theme: {
@@ -135,9 +132,8 @@
                 }
             }
         };
-
         // Apply the theme
-        Highcharts.setOptions(Highcharts.theme);
+        setOptions(Highcharts.theme);
 
     });
     _registerModule(_modules, 'masters/themes/grid.src.js', [], function () {

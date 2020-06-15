@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * (c) 2009-2019 Torstein Honsi
  *
@@ -26,28 +26,26 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'themes/dark-unica.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'themes/dark-unica.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (Highcharts, U) {
         /* *
          *
-         *  (c) 2010-2019 Torstein Honsi
+         *  (c) 2010-2020 Torstein Honsi
          *
          *  License: www.highcharts.com/license
          *
          *  Dark theme for Highcharts JS
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
         /* global document */
-
         // Load the fonts
-
+        var setOptions = U.setOptions;
         Highcharts.createElement('link', {
             href: 'https://fonts.googleapis.com/css?family=Unica+One',
             rel: 'stylesheet',
             type: 'text/css'
         }, null, document.getElementsByTagName('head')[0]);
-
         Highcharts.theme = {
             colors: ['#2b908f', '#90ee7e', '#f45b5b', '#7798BF', '#aaeeee', '#ff0066',
                 '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'],
@@ -90,7 +88,6 @@
                 title: {
                     style: {
                         color: '#A0A0A3'
-
                     }
                 }
             },
@@ -166,7 +163,6 @@
                     color: '#707073'
                 }
             },
-
             drilldown: {
                 activeAxisLabelStyle: {
                     color: '#F0F0F3'
@@ -175,7 +171,6 @@
                     color: '#F0F0F3'
                 }
             },
-
             navigation: {
                 buttonOptions: {
                     symbolStroke: '#DDDDDD',
@@ -184,7 +179,6 @@
                     }
                 }
             },
-
             // scroll charts
             rangeSelector: {
                 buttonTheme: {
@@ -219,7 +213,6 @@
                     color: 'silver'
                 }
             },
-
             navigator: {
                 handles: {
                     backgroundColor: '#666',
@@ -235,7 +228,6 @@
                     gridLineColor: '#505053'
                 }
             },
-
             scrollbar: {
                 barBackgroundColor: '#808083',
                 barBorderColor: '#808083',
@@ -247,9 +239,8 @@
                 trackBorderColor: '#404043'
             }
         };
-
         // Apply the theme
-        Highcharts.setOptions(Highcharts.theme);
+        setOptions(Highcharts.theme);
 
     });
     _registerModule(_modules, 'masters/themes/dark-unica.src.js', [], function () {

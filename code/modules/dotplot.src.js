@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * Dot plot series type for Highcharts
  *
@@ -28,10 +28,10 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'modules/dotplot.src.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (H, U) {
+    _registerModule(_modules, 'modules/dotplot.src.js', [_modules['parts/SVGRenderer.js'], _modules['parts/Utilities.js']], function (SVGRenderer, U) {
         /* *
          *
-         *  (c) 2009-2019 Torstein Honsi
+         *  (c) 2009-2020 Torstein Honsi
          *
          *  Dot plot series type for Highcharts
          *
@@ -47,8 +47,7 @@
          * - Custom icons like persons, carts etc. Either as images, font icons or
          *   Highcharts symbols.
          */
-        var objectEach = U.objectEach;
-        var extend = H.extend, pick = H.pick, seriesType = H.seriesType;
+        var extend = U.extend, objectEach = U.objectEach, pick = U.pick, seriesType = U.seriesType;
         /**
          * @private
          * @class
@@ -66,6 +65,7 @@
                 }
             }
         }, {
+            markerAttribs: void 0,
             drawPoints: function () {
                 var series = this, renderer = series.chart.renderer, seriesMarkerOptions = this.options.marker, itemPaddingTranslated = this.yAxis.transA *
                     series.options.itemPadding, borderWidth = this.borderWidth, crisp = borderWidth % 2 ? 0.5 : 1;
@@ -130,8 +130,8 @@
                 });
             }
         });
-        H.SVGRenderer.prototype.symbols.rect = function (x, y, w, h, options) {
-            return H.SVGRenderer.prototype.symbols.callout(x, y, w, h, options);
+        SVGRenderer.prototype.symbols.rect = function (x, y, w, h, options) {
+            return SVGRenderer.prototype.symbols.callout(x, y, w, h, options);
         };
 
     });

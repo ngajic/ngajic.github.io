@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * (c) 2009-2019 Torstein Honsi
  *
@@ -26,28 +26,26 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'themes/grid-light.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'themes/grid-light.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (Highcharts, U) {
         /* *
          *
-         *  (c) 2010-2019 Torstein Honsi
+         *  (c) 2010-2020 Torstein Honsi
          *
          *  License: www.highcharts.com/license
          *
          *  Grid-light theme for Highcharts JS
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
         /* global document */
-
-
+        var setOptions = U.setOptions;
         // Load the fonts
         Highcharts.createElement('link', {
             href: 'https://fonts.googleapis.com/css?family=Dosis:400,600',
             rel: 'stylesheet',
             type: 'text/css'
         }, null, document.getElementsByTagName('head')[0]);
-
         Highcharts.theme = {
             colors: ['#7cb5ec', '#f7a35c', '#90ee7e', '#7798BF', '#aaeeee', '#ff0066',
                 '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'],
@@ -102,11 +100,9 @@
                     lineColor: '#404048'
                 }
             }
-
         };
-
         // Apply the theme
-        Highcharts.setOptions(Highcharts.theme);
+        setOptions(Highcharts.theme);
 
     });
     _registerModule(_modules, 'masters/themes/grid-light.src.js', [], function () {

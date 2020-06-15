@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * (c) 2010-2019 Highsoft AS
  * Author: Sebastian Domas
@@ -33,8 +33,8 @@
          *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
          *
          * */
-        var defined = U.defined;
-        var Series = H.Series, addEvent = H.addEvent, noop = H.noop;
+        var addEvent = U.addEvent, defined = U.defined;
+        var Series = H.Series, noop = H.noop;
         /* ************************************************************************** *
          *
          * DERIVED SERIES MIXIN
@@ -144,7 +144,7 @@
 
         return derivedSeriesMixin;
     });
-    _registerModule(_modules, 'modules/histogram.src.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js'], _modules['mixins/derived-series.js']], function (H, U, derivedSeriesMixin) {
+    _registerModule(_modules, 'modules/histogram.src.js', [_modules['parts/Utilities.js'], _modules['mixins/derived-series.js']], function (U, derivedSeriesMixin) {
         /* *
          *
          *  Copyright (c) 2010-2017 Highsoft AS
@@ -155,8 +155,7 @@
          *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
          *
          * */
-        var isNumber = U.isNumber, objectEach = U.objectEach;
-        var seriesType = H.seriesType, correctFloat = H.correctFloat, arrayMax = H.arrayMax, arrayMin = H.arrayMin, merge = H.merge;
+        var arrayMax = U.arrayMax, arrayMin = U.arrayMin, correctFloat = U.correctFloat, isNumber = U.isNumber, merge = U.merge, objectEach = U.objectEach, seriesType = U.seriesType;
         /* ************************************************************************** *
          *  HISTOGRAM
          * ************************************************************************** */
@@ -211,6 +210,7 @@
          *               stacking
          * @product      highcharts
          * @since        6.0.0
+         * @requires     modules/histogram
          * @optionparent plotOptions.histogram
          */
         {
@@ -232,7 +232,7 @@
              *
              * @type {number}
              */
-            binWidth: undefined,
+            binWidth: void 0,
             pointPadding: 0,
             groupPadding: 0,
             grouping: false,
@@ -258,9 +258,12 @@
                 // Float correction needed, because first frequency value is not
                 // corrected when generating frequencies (within for loop).
                 min = correctFloat(arrayMin(baseData)), frequencies = [], bins = {}, data = [], x, fitToBin;
-                binWidth = series.binWidth = series.options.pointRange = (correctFloat(isNumber(binWidth) ?
+                binWidth = series.binWidth = (correctFloat(isNumber(binWidth) ?
                     (binWidth || 1) :
                     (max - min) / binsNumber));
+                // #12077 negative pointRange causes wrong calculations,
+                // browser hanging.
+                series.options.pointRange = Math.max(binWidth, 0);
                 // If binWidth is 0 then max and min are equaled,
                 // increment the x with some positive value to quit the loop
                 for (x = min; 
@@ -271,7 +274,11 @@
                 x < max &&
                     (series.userOptions.binWidth ||
                         correctFloat(max - x) >= binWidth ||
-                        correctFloat(min + (frequencies.length * binWidth) - x) <= 0); x = correctFloat(x + binWidth)) {
+                        // #13069 - Every add and subtract operation should
+                        // be corrected, due to general problems with
+                        // operations on float numbers in JS.
+                        correctFloat(correctFloat(min + (frequencies.length * binWidth)) -
+                            x) <= 0); x = correctFloat(x + binWidth)) {
                     frequencies.push(x);
                     bins[x] = 0;
                 }
@@ -317,6 +324,7 @@
          * @excluding data, dataParser, dataURL
          * @product   highcharts
          * @since     6.0.0
+         * @requires  modules/histogram
          * @apioption series.histogram
          */
         /**
@@ -329,10 +337,10 @@
         ''; // adds doclets above to transpiled file
 
     });
-    _registerModule(_modules, 'modules/bellcurve.src.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js'], _modules['mixins/derived-series.js']], function (H, U, derivedSeriesMixin) {
+    _registerModule(_modules, 'modules/bellcurve.src.js', [_modules['parts/Utilities.js'], _modules['mixins/derived-series.js']], function (U, derivedSeriesMixin) {
         /* *
          *
-         *  (c) 2010-2019 Highsoft AS
+         *  (c) 2010-2020 Highsoft AS
          *
          *  Author: Sebastian Domas
          *
@@ -341,8 +349,7 @@
          *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
          *
          * */
-        var isNumber = U.isNumber;
-        var seriesType = H.seriesType, correctFloat = H.correctFloat, merge = H.merge;
+        var correctFloat = U.correctFloat, isNumber = U.isNumber, merge = U.merge, seriesType = U.seriesType;
         /* ************************************************************************** *
          *  BELL CURVE                                                                *
          * ************************************************************************** */
@@ -401,6 +408,7 @@
          * @product      highcharts
          * @excluding    boostThreshold, connectNulls, dragDrop, stacking,
          *               pointInterval, pointIntervalUnit
+         * @requires     modules/bellcurve
          * @optionparent plotOptions.bellcurve
          */
         , {
@@ -460,6 +468,7 @@
          * @since     6.0.0
          * @product   highcharts
          * @excluding dataParser, dataURL, data
+         * @requires  modules/bellcurve
          * @apioption series.bellcurve
          */
         /**

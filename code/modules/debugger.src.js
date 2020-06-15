@@ -1,5 +1,5 @@
 /**
- * @license Highcharts JS v7.2.0 (2019-09-03)
+ * @license Highcharts JS v8.1.1 (2020-06-09)
  *
  * Debugger module
  *
@@ -54,7 +54,7 @@
             },
             "12": {
                 "title": "Highcharts expects point configuration to be numbers or arrays in turbo mode",
-                "text": "<h1>Highcharts expects point configuration to be numbers or arrays in turbo mode</h1><p>This error occurs if the series.data option contains object configurations and the number of points exceeds the turboThreshold. It can be fixed by either setting <code>turboThreshold</code> to a higher value, or changing the point configurations to numbers or arrays.</p><p>See <a href=\"https://api.highcharts.com/highcharts#plotOptions.series.turboThreshold\">plotOptions.series.turboThreshold</a></p>"
+                "text": "<h1>Highcharts expects point configuration to be numbers or arrays in turbo mode</h1><p>This error occurs if the <code>series.data</code> option contains object configurations and the number of points exceeds the turboThreshold. It can be fixed by either setting <code>turboThreshold</code> to a higher value, or changing the point configurations to numbers or arrays.</p><p>In boost mode, turbo mode is always on, which means only array of numbers or two dimensional arrays are allowed.</p><p>See <a href=\"https://api.highcharts.com/highcharts#plotOptions.series.turboThreshold\">plotOptions.series.turboThreshold</a></p>"
             },
             "13": {
                 "title": "Rendering div not found",
@@ -132,6 +132,10 @@
                 "title": "Non-unique point or node id",
                 "text": "<h1>Non-unique point or node id</h1><p>This error occurs when using the same <code>id</code> for two or more points or nodes.</p>"
             },
+            "32": {
+                "title": "Deprecated function or property",
+                "text": "<h1>Deprecated function or property</h1><p>This error occurs when using a deprecated function or property. Consult the <a href=\"https://api.highcharts.com/\">API documentation</a> for alternatives, if no replacement is mentioned by the error itself.</p>"
+            },
             "meta": {
                 "files": [
                     "errors/10/readme.md",
@@ -156,7 +160,8 @@
                     "errors/28/readme.md",
                     "errors/29/readme.md",
                     "errors/30/readme.md",
-                    "errors/31/readme.md"
+                    "errors/31/readme.md",
+                    "errors/32/readme.md"
                 ]
             }
         };
@@ -165,15 +170,14 @@
     _registerModule(_modules, 'modules/debugger.src.js', [_modules['parts/Globals.js'], _modules['parts/Utilities.js']], function (H, U) {
         /* *
          *
-         *  (c) 2010-2019 Torstein Honsi
+         *  (c) 2010-2020 Torstein Honsi
          *
          *  License: www.highcharts.com/license
          *
          *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
          *
          * */
-        var isNumber = U.isNumber;
-        var addEvent = H.addEvent, setOptions = H.setOptions, each = H.each;
+        var addEvent = U.addEvent, isNumber = U.isNumber, setOptions = U.setOptions;
         setOptions({
             /**
              * @optionparent chart
@@ -183,12 +187,11 @@
                  * Whether to display errors on the chart. When `false`, the errors will
                  * be shown only in the console.
                  *
-                 * Requires `debugger.js` module.
-                 *
                  * @sample highcharts/chart/display-errors/
                  *         Show errors on chart
                  *
-                 * @since 7.0.0
+                 * @since    7.0.0
+                 * @requires modules/debugger
                  */
                 displayErrors: true
             }
@@ -197,34 +200,37 @@
         addEvent(H.Chart, 'displayError', function (e) {
             var chart = this, code = e.code, msg, options = chart.options.chart, renderer = chart.renderer, chartWidth, chartHeight;
             if (chart.errorElements) {
-                each(chart.errorElements, function (el) {
+                (chart.errorElements).forEach(function (el) {
                     if (el) {
                         el.destroy();
                     }
                 });
             }
-            if (options && options.displayErrors) {
+            if (options && options.displayErrors && renderer) {
                 chart.errorElements = [];
                 msg = isNumber(code) ?
                     ('Highcharts error #' + code + ': ' +
-                        H.errorMessages[code].title +
                         H.errorMessages[code].text) :
                     code;
                 chartWidth = chart.chartWidth;
                 chartHeight = chart.chartHeight;
+                // Format msg so SVGRenderer can handle it
+                msg = msg
+                    .replace(/<h1>(.*)<\/h1>/g, '<br><span style="font-size: 24px">$1</span><br>')
+                    .replace(/<\/p>/g, '</p><br>');
                 // Render red chart frame.
                 chart.errorElements[0] = renderer.rect(2, 2, chartWidth - 4, chartHeight - 4).attr({
                     'stroke-width': 4,
                     stroke: '#ff0000',
                     zIndex: 3
                 }).add();
-                // Render error message.
-                chart.errorElements[1] = renderer.label(msg, 0, 0, 'rect', null, null, true).css({
+                // Render error message
+                chart.errorElements[1] = renderer.label(msg, 0, 0, 'rect', void 0, void 0, void 0, void 0, 'debugger').css({
                     color: '#ffffff',
-                    width: chartWidth - 16,
+                    width: (chartWidth - 16) + 'px',
                     padding: 0
                 }).attr({
-                    fill: '#ff0000',
+                    fill: 'rgba(255, 0, 0, 0.9)',
                     width: chartWidth,
                     padding: 8,
                     zIndex: 10
@@ -237,7 +243,7 @@
         addEvent(H.Chart, 'beforeRedraw', function () {
             var errorElements = this.errorElements;
             if (errorElements && errorElements.length) {
-                each(errorElements, function (el) {
+                errorElements.forEach(function (el) {
                     el.destroy();
                 });
             }

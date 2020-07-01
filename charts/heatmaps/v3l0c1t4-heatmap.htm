@@ -184,6 +184,66 @@ Highcharts.chart('container', {
 		}
 	}]
 })
+		</script><hr>
+
+	<div id="container2" style="min-width: 310px; max-width: 1600px; height: 600px; margin: 0 auto"></div>
+
+		<script type="text/javascript">
+
+Highcharts.chart('container2', {
+	chart: {
+		type: 'column',
+	},
+	title: {
+		text: 'Positions histogram'
+	},
+	xAxis: {
+		categories: ['0th', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th']
+	},
+	yAxis: {
+		min: 0,
+		title: {
+			text: 'Positions histogram'
+		},
+		stackLabels: {
+			enabled: true,
+			style: {
+				fontWeight: 'bold',
+				color: ( //theme
+				Highcharts.defaultOptions.title.style && Highcharts.defaultOptions.title.style.color) || 'gray'
+			}
+		}
+	},
+	legend: {
+		align: 'right',
+		x: -30,
+		verticalAlign: 'top',
+		y: 25,
+		backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
+		borderColor: '#CCC',
+		borderWidth: 1,
+		shadow: false
+	},
+	tooltip: {
+		headerFormat: '<b>{point.x}</b><br/>',
+		pointFormat: '{series.name}: {point.y}<br/>'
+	},
+	plotOptions: {
+		column: {
+			pointPadding: 0,
+			borderWidth: 0,
+			groupPadding: 0,
+			stacking: 'normal',
+			dataLabels: {
+				enabled: false
+			}
+		}
+	},
+	series: [{
+		name: 'Number of positions',
+		data: [21, 34, 20, 13, 15, 19, 20, 27, 19, 15]
+	}]
+})
 		</script>
 	</body>
 </html>

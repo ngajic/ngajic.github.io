@@ -25,8 +25,11 @@ header h1 {
 	padding-bottom: 0;
 }
 
-nav ul {
-	    list-style-type: none;
+ul {
+	list-style-type: none;
+}
+
+nav ul { 
 		margin: 0;
 		padding-left: 0px;
 		background-image: url(../img/ninja.png);
@@ -67,6 +70,17 @@ main {
 #about-article {
 	margin: 50px;
 	margin-left: 80px;
+}
+
+#latest-0ths {
+	background-color: #CBCAD0;
+	font-family: uni0553, 'Times New Roman';	
+	padding: 30px 30px;
+	height:492px;
+}
+
+#latest-0ths marquee {
+	height:326px;
 }
 
 aside h2 {

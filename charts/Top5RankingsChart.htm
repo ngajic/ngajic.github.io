@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Top 5 Rankings Chart</title>
+		<title>Points Rankings Chart</title>
 
 
 		<link rel="stylesheet" type="text/css" href="../css/styles.css">
@@ -25,9 +25,10 @@
 			><li><a href="0thRankingsChart.htm">0th Rankings</a></li
 			><li><a href="0thRankingsNoTiesChart.htm">Pure 0th Rankings</a></li
 			><li><a href="Top10RankingsChart.htm">Top 10 Rankings</a></li
-			><li><a href="#">Top 5 Rankings</a></li
-			><li><a href="PointsRankingsChart.htm">Points Rankings</a></li
+			><li><a href="Top5RankingsChart.htm">Top 5 Rankings</a></li
+			><li><a href="#">Points Rankings</a></li
 			><li><a href="AverageRankingsChart.htm">Average Rankings</a></li
+			><li><a href="0thsActivity.htm">0ths Action</a></li
 			><li><a href="../about.htm">About</a></li>
 		</nav>
 		</ul>
@@ -43,7 +44,7 @@ Highcharts.chart('container', {
 		zoomType: 'xy'
 	},
 	title: {
-		text: 'Nv2 Top5 rankings'
+		text: 'Nv2 Points rankings'
 	},
 	subtitle: {
 		text: 'Irregular time data in Highcharts JS'
@@ -62,7 +63,7 @@ Highcharts.chart('container', {
 	},
 	tooltip: {
 		headerFormat: '<b>{series.name}</b><br>',
-		pointFormat: '{point.x:%e. %b}: {point.y:%f} Top5s'
+		pointFormat: '{point.x:%e. %b}: {point.y:%f} points'
 	},
 	plotOptions: {
 		spline: {

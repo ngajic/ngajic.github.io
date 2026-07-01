@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1410">
+<title>Tally — split the bill</title>
+<style>
+  :root{
+    --bg:#0f1410;
+    --surface:#171f18;
+    --surface-2:#1f2a20;
+    --ink:#eef2ec;
+    --ink-dim:#9aa89a;
+    --ink-faint:#5e6e5e;
+    --line:#2a382b;
+    --acc:#7dd97a;
+    --acc-deep:#4faf57;
+    --owe:#f0a868;
+    --get:#7dd97a;
+    --danger:#e2725b;
+    --r:14px;
+    --tap:48px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.45;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:18px 16px 120px}
+
+  /* ---- header ---- */
+  header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+  .brand{font-size:1.55rem;font-weight:800;letter-spacing:-.02em;display:flex;align-items:baseline;gap:8px}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--acc);display:inline-block;transform:translateY(-2px)}
+  .trip-name{
+    background:none;border:none;color:var(--ink-dim);font-size:.95rem;font-weight:600;
+    text-align:right;padding:6px 4px;max-width:170px;font-family:inherit;
+    border-bottom:1px dashed transparent;
+  }
+  .trip-name:focus{outline:none;border-bottom-color:var(--line);color:var(--ink)}
+
+  /* ---- summary band ---- */
+  .summary{
+    background:linear-gradient(160deg,var(--surface-2),var(--surface));
+    border:1px solid var(--line);border-radius:var(--r);
+    padding:16px;margin:14px 0 22px;
+  }
+  .summary .total-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);font-weight:700}
+  .summary .total{font-size:2.1rem;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+  .summary .meta{font-size:.82rem;color:var(--ink-dim);margin-top:2px}
+
+  /* ---- section heads ---- */
+  .sec-head{
+    display:flex;align-items:center;gap:10px;margin:24px 2px 12px;
+  }
+  .sec-head h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-dim);margin:0;font-weight:700}
+  .sec-head .rule{flex:1;height:1px;background:var(--line)}
+  .count{font-size:.72rem;color:var(--ink-faint);background:var(--surface);padding:1px 8px;border-radius:20px;border:1px solid var(--line)}
+
+  /* ---- people chips ---- */
+  .people{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;background:var(--surface);
+    border:1px solid var(--line);border-radius:30px;padding:7px 8px 7px 13px;
+    font-size:.9rem;font-weight:600;
+  }
+  .chip .x{
+    width:22px;height:22px;border-radius:50%;border:none;background:var(--surface-2);
+    color:var(--ink-faint);font-size:1rem;line-height:1;cursor:pointer;display:grid;place-items:center;
+  }
+  .chip .x:hover{background:var(--danger);color:#fff}
+  .add-person{
+    display:flex;gap:8px;margin-top:12px;
+  }
+  .add-person input{flex:1}
+
+  /* ---- inputs ---- */
+  input[type=text],input[type=number],select{
+    width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);
+    border-radius:11px;padding:0 14px;height:var(--tap);font-size:1rem;font-family:inherit;
+    appearance:none;
+  }
+  input::placeholder{color:var(--ink-faint)}
+  input:focus,select:focus{outline:none;border-color:var(--acc-deep);background:var(--surface-2)}
+  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239aa89a' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+  label.fld{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);font-weight:700;margin:0 0 5px 3px}
+
+  /* ---- buttons ---- */
+  button{font-family:inherit}
+  .btn{
+    height:var(--tap);border:none;border-radius:11px;background:var(--acc);color:#0c1a0c;
+    font-weight:700;font-size:.95rem;cursor:pointer;padding:0 18px;display:inline-flex;
+    align-items:center;justify-content:center;gap:8px;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.full{width:100%}
+  .btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+  .btn.icon{width:var(--tap);padding:0;flex:none;font-size:1.4rem}
+
+  /* ---- expense form card ---- */
+  .form-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+  .row{display:flex;gap:10px;margin-bottom:12px}
+  .row > *{flex:1}
+  .row.tight{margin-bottom:0}
+  .split-toggle{display:flex;gap:6px;margin:2px 0 12px}
+  .split-toggle button{
+    flex:1;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);
+    color:var(--ink-dim);font-size:.82rem;font-weight:600;cursor:pointer;
+  }
+  .split-toggle button.on{background:var(--acc-deep);color:#fff;border-color:var(--acc-deep)}
+  .split-people{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .sp{
+    font-size:.85rem;padding:6px 12px;border-radius:20px;border:1px solid var(--line);
+    background:var(--surface-2);color:var(--ink-faint);cursor:pointer;user-select:none;font-weight:600;
+  }
+  .sp.on{background:rgba(125,217,122,.14);color:var(--acc);border-color:var(--acc-deep)}
+
+  /* ---- expense list ---- */
+  .exp{
+    display:flex;align-items:center;gap:13px;background:var(--surface);
+    border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;
+  }
+  .exp .av{
+    width:38px;height:38px;border-radius:10px;background:var(--surface-2);color:var(--acc);
+    display:grid;place-items:center;font-weight:700;font-size:.95rem;flex:none;
+  }
+  .exp .body{flex:1;min-width:0}
+  .exp .ttl{font-weight:600;font-size:.97rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .exp .sub{font-size:.78rem;color:var(--ink-dim);margin-top:1px}
+  .exp .amt{font-weight:700;font-size:1rem;flex:none}
+  .exp .del{
+    width:30px;height:30px;border-radius:8px;border:none;background:transparent;color:var(--ink-faint);
+    cursor:pointer;flex:none;font-size:1.1rem;
+  }
+  .exp .del:hover{background:var(--danger);color:#fff}
+
+  /* ---- settlement ---- */
+  .settle{
+    display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:12px;
+    background:var(--surface);border:1px solid var(--line);margin-bottom:9px;
+  }
+  .settle .who{font-weight:700}
+  .settle .arrow{color:var(--ink-faint);flex:1;display:flex;align-items:center;gap:8px;font-size:.9rem}
+  .settle .arrow svg{flex:none}
+  .settle .sum{font-weight:800;color:var(--owe);font-size:1.02rem}
+  .all-square{
+    text-align:center;padding:26px 16px;color:var(--ink-dim);background:var(--surface);
+    border:1px dashed var(--line);border-radius:12px;font-size:.95rem;
+  }
+  .all-square .big{font-size:1.6rem;margin-bottom:4px}
+
+  /* ---- balances mini ---- */
+  .bal{display:flex;justify-content:space-between;padding:9px 13px;font-size:.9rem;border-bottom:1px solid var(--line)}
+  .bal:last-child{border-bottom:none}
+  .bal .pos{color:var(--get);font-weight:700}
+  .bal .neg{color:var(--owe);font-weight:700}
+  .bal .zero{color:var(--ink-faint);font-weight:600}
+  .bal-wrap{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+
+  /* ---- empty states ---- */
+  .empty{color:var(--ink-faint);font-size:.9rem;text-align:center;padding:18px}
+
+  /* ---- footer actions ---- */
+  .foot{display:flex;gap:10px;margin-top:30px}
+  .foot .btn{flex:1;font-size:.85rem}
+
+  /* ---- toast ---- */
+  .toast{
+    position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:30px;font-size:.88rem;font-weight:600;
+    opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.4);max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ---- modal ---- */
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;padding:24px;z-index:60;
+  }
+  .modal-bg.show{display:flex}
+  .modal{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;
+    max-width:420px;width:100%;
+  }
+  .modal h3{margin:0 0 6px;font-size:1.1rem}
+  .modal p{margin:0 0 16px;color:var(--ink-dim);font-size:.9rem}
+  .modal .acts{display:flex;gap:10px}
+  .modal .acts .btn{flex:1}
+  .share-box{
+    width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink-dim);
+    font-size:.78rem;padding:11px;font-family:ui-monospace,monospace;word-break:break-all;margin-bottom:14px;
+    max-height:120px;overflow:auto;resize:none;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand"><span class="dot"></span>Tally</div>
+    <input class="trip-name" id="tripName" placeholder="Name this split" maxlength="28">
+  </header>
+
+  <div class="summary">
+    <div class="total-label">Total spent</div>
+    <div class="total" id="grandTotal">0.00</div>
+    <div class="meta" id="summaryMeta">Add people, then start logging expenses</div>
+  </div>
+
+  <!-- PEOPLE -->
+  <div class="sec-head"><h2>People</h2><div class="rule"></div><span class="count" id="peopleCount">0</span></div>
+  <div class="people" id="peopleList"></div>
+  <div class="add-person">
+    <input type="text" id="personInput" placeholder="Add a name…" maxlength="20" autocomplete="off">
+    <button class="btn icon" id="addPersonBtn" aria-label="Add person">+</button>
+  </div>
+
+  <!-- ADD EXPENSE -->
+  <div class="sec-head"><h2>Add expense</h2><div class="rule"></div></div>
+  <div class="form-card" id="expenseForm">
+    <div class="row tight" style="margin-bottom:12px">
+      <input type="text" id="expDesc" placeholder="What was it for?" maxlength="40">
+    </div>
+    <div class="row">
+      <div style="flex:1.1">
+        <input type="number" id="expAmount" placeholder="0.00" inputmode="decimal" step="0.01" min="0">
+      </div>
+      <div style="flex:1.4">
+        <select id="expPayer"><option value="">Paid by…</option></select>
+      </div>
+    </div>
+    <label class="fld">Split between</label>
+    <div class="split-toggle">
+      <button id="splitAllBtn" class="on" type="button">Everyone</button>
+      <button id="splitSomeBtn" type="button">Just some</button>
+    </div>
+    <div class="split-people" id="splitPeople"></div>
+    <button class="btn full" id="addExpenseBtn">Add expense</button>
+  </div>
+
+  <!-- EXPENSES -->
+  <div class="sec-head"><h2>Expenses</h2><div class="rule"></div><span class="count" id="expCount">0</span></div>
+  <div id="expenseList"></div>
+
+  <!-- WHO OWES -->
+  <div class="sec-head"><h2>Settle up</h2><div class="rule"></div></div>
+  <div id="settleList"></div>
+
+  <!-- BALANCES -->
+  <div class="sec-head"><h2>Balances</h2><div class="rule"></div></div>
+  <div class="bal-wrap" id="balanceList"></div>
+
+  <!-- FOOTER -->
+  <div class="foot">
+    <button class="btn ghost" id="shareBtn">↗ Share / Backup</button>
+    <button class="btn ghost" id="resetBtn" style="color:var(--danger)">↺ Reset</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- RESET MODAL -->
+<div class="modal-bg" id="resetModal">
+  <div class="modal">
+    <h3>Start fresh?</h3>
+    <p>This clears all people and expenses for a new split. This can't be undone — back up first if you want to keep it.</p>
+    <div class="acts">
+      <button class="btn ghost" id="resetCancel">Cancel</button>
+      <button class="btn" id="resetConfirm" style="background:var(--danger);color:#fff">Reset everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-bg" id="shareModal">
+  <div class="modal">
+    <h3>Share or back up</h3>
+    <p>Copy this link to open the same tally on another device, or paste a link someone sent you.</p>
+    <textarea class="share-box" id="shareBox" readonly rows="3"></textarea>
+    <div class="acts" style="margin-bottom:10px">
+      <button class="btn" id="copyLinkBtn">Copy link</button>
+      <button class="btn ghost" id="shareClose">Close</button>
+    </div>
+    <div class="acts">
+      <button class="btn ghost full" id="loadPasteBtn" style="font-size:.82rem">Paste a link to load it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// ---------- state ----------
+const KEY = "tally.v1";
+let state = { name:"", people:[], expenses:[], splitMode:"all", splitSel:[] };
+
+function blank(){ return { name:"", people:[], expenses:[], splitMode:"all", splitSel:[] }; }
+
+// ---------- persistence ----------
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function load(){
+  // URL takes priority (incoming share link)
+  const fromUrl = readHash();
+  if(fromUrl){ state = fromUrl; save(); history.replaceState(null,"",location.pathname); return; }
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ state = Object.assign(blank(), JSON.parse(raw)); }
+  }catch(e){ state = blank(); }
+}
+
+// ---------- share encoding ----------
+function encodeState(s){
+  const json = JSON.stringify({n:s.name,p:s.people,e:s.expenses});
+  return btoa(unescape(encodeURIComponent(json)));
+}
+function decodeState(str){
+  try{
+    const o = JSON.parse(decodeURIComponent(escape(atob(str))));
+    return Object.assign(blank(), { name:o.n||"", people:o.p||[], expenses:o.e||[] });
+  }catch(e){ return null; }
+}
+function readHash(){
+  const h = location.hash;
+  if(h && h.startsWith("#d=")) return decodeState(h.slice(3));
+  return null;
+}
+function shareLink(){ return location.origin + location.pathname + "#d=" + encodeState(state); }
+
+// ---------- money helpers ----------
+const fmt = n => (Math.round(n*100)/100).toFixed(2);
+const initials = name => name.trim().slice(0,2).toUpperCase();
+
+// ---------- compute balances + settlements ----------
+function computeBalances(){
+  const bal = {};
+  state.people.forEach(p => bal[p] = 0);
+  state.expenses.forEach(ex => {
+    const parts = ex.split.filter(p => bal.hasOwnProperty(p));
+    if(parts.length === 0 || !bal.hasOwnProperty(ex.payer)) return;
+    const share = ex.amount / parts.length;
+    bal[ex.payer] += ex.amount;
+    parts.forEach(p => bal[p] -= share);
+  });
+  return bal;
+}
+
+function simplifyDebts(bal){
+  const creditors = [], debtors = [];
+  Object.entries(bal).forEach(([p,v])=>{
+    const r = Math.round(v*100)/100;
+    if(r > 0.005) creditors.push({p,v:r});
+    else if(r < -0.005) debtors.push({p,v:-r});
+  });
+  creditors.sort((a,b)=>b.v-a.v);
+  debtors.sort((a,b)=>b.v-a.v);
+  const out=[];
+  let i=0,j=0;
+  while(i<debtors.length && j<creditors.length){
+    const pay = Math.min(debtors[i].v, creditors[j].v);
+    out.push({from:debtors[i].p, to:creditors[j].p, amount:pay});
+    debtors[i].v -= pay; creditors[j].v -= pay;
+    if(debtors[i].v < 0.005) i++;
+    if(creditors[j].v < 0.005) j++;
+  }
+  return out;
+}
+
+// ---------- rendering ----------
+const $ = id => document.getElementById(id);
+
+function render(){
+  // trip name
+  if($("tripName").value !== state.name) $("tripName").value = state.name;
+
+  // totals
+  const total = state.expenses.reduce((s,e)=>s+e.amount,0);
+  $("grandTotal").textContent = fmt(total);
+  const np = state.people.length, ne = state.expenses.length;
+  $("summaryMeta").textContent =
+    ne===0 ? (np===0 ? "Add people, then start logging expenses"
+                     : `${np} ${np===1?"person":"people"} · no expenses yet`)
+           : `${ne} ${ne===1?"expense":"expenses"} · ${np} ${np===1?"person":"people"} · ${fmt(total/np)} avg pp`;
+
+  renderPeople();
+  renderPayerOptions();
+  renderSplitPeople();
+  renderExpenses();
+  renderSettlements();
+  renderBalances();
+  save();
+}
+
+function renderPeople(){
+  $("peopleCount").textContent = state.people.length;
+  const c = $("peopleList");
+  c.innerHTML = "";
+  if(state.people.length === 0){
+    c.innerHTML = '<div class="empty">No one yet. Add the people splitting costs.</div>';
+    return;
+  }
+  state.people.forEach(p=>{
+    const el = document.createElement("div");
+    el.className = "chip";
+    el.innerHTML = `<span>${esc(p)}</span><button class="x" aria-label="Remove ${esc(p)}">×</button>`;
+    el.querySelector(".x").onclick = ()=> removePerson(p);
+    c.appendChild(el);
+  });
+}
+
+function renderPayerOptions(){
+  const sel = $("expPayer");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Paid by…</option>' +
+    state.people.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");
+  if(state.people.includes(cur)) sel.value = cur;
+}
+
+function renderSplitPeople(){
+  $("splitAllBtn").classList.toggle("on", state.splitMode==="all");
+  $("splitSomeBtn").classList.toggle("on", state.splitMode==="some");
+  const c = $("splitPeople");
+  c.style.display = state.splitMode==="some" ? "flex" : "none";
+  if(state.splitMode!=="some") return;
+  c.innerHTML = "";
+  state.people.forEach(p=>{
+    const el = document.createElement("div");
+    el.className = "sp" + (state.splitSel.includes(p) ? " on":"");
+    el.textContent = p;
+    el.onclick = ()=>{
+      const i = state.splitSel.indexOf(p);
+      if(i>=0) state.splitSel.splice(i,1); else state.splitSel.push(p);
+      renderSplitPeople();
+    };
+    c.appendChild(el);
+  });
+}
+
+function renderExpenses(){
+  $("expCount").textContent = state.expenses.length;
+  const c = $("expenseList");
+  c.innerHTML = "";
+  if(state.expenses.length === 0){
+    c.innerHTML = '<div class="empty">No expenses logged yet.</div>';
+    return;
+  }
+  // newest first
+  [...state.expenses].reverse().forEach(ex=>{
+    const everyone = ex.split.length === state.people.length;
+    const splitTxt = everyone ? "split evenly" : "split " + ex.split.length + " ways";
+    const el = document.createElement("div");
+    el.className = "exp";
+    el.innerHTML = `
+      <div class="av">${esc(initials(ex.payer))}</div>
+      <div class="body">
+        <div class="ttl">${esc(ex.desc||"Expense")}</div>
+        <div class="sub">${esc(ex.payer)} paid · ${splitTxt}</div>
+      </div>
+      <div class="amt">${fmt(ex.amount)}</div>
+      <button class="del" aria-label="Delete">🗑</button>`;
+    el.querySelector(".del").onclick = ()=> removeExpense(ex.id);
+    c.appendChild(el);
+  });
+}
+
+function renderSettlements(){
+  const c = $("settleList");
+  c.innerHTML = "";
+  const bal = computeBalances();
+  const moves = simplifyDebts(bal);
+  if(state.expenses.length === 0){
+    c.innerHTML = '<div class="empty">Settlements appear once there are expenses.</div>';
+    return;
+  }
+  if(moves.length === 0){
+    c.innerHTML = `<div class="all-square"><div class="big">✓</div>Everyone's square. Nothing owed.</div>`;
+    return;
+  }
+  moves.forEach(m=>{
+    const el = document.createElement("div");
+    el.className = "settle";
+    el.innerHTML = `
+      <span class="who">${esc(m.from)}</span>
+      <span class="arrow">
+        <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h17m0 0l-4-4m4 4l-4 4" stroke="#5e6e5e" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ${esc(m.to)}
+      </span>
+      <span class="sum">${fmt(m.amount)}</span>`;
+    c.appendChild(el);
+  });
+}
+
+function renderBalances(){
+  const c = $("balanceList");
+  c.innerHTML = "";
+  if(state.people.length === 0){ c.innerHTML = '<div class="empty">—</div>'; return; }
+  const bal = computeBalances();
+  state.people.forEach(p=>{
+    const v = Math.round(bal[p]*100)/100;
+    const cls = v>0.005?"pos":(v<-0.005?"neg":"zero");
+    const txt = v>0.005?`gets back ${fmt(v)}`:(v<-0.005?`owes ${fmt(-v)}`:`settled`);
+    const el = document.createElement("div");
+    el.className = "bal";
+    el.innerHTML = `<span>${esc(p)}</span><span class="${cls}">${txt}</span>`;
+    c.appendChild(el);
+  });
+}
+
+// ---------- actions ----------
+function addPerson(){
+  const inp = $("personInput");
+  const name = inp.value.trim();
+  if(!name) return;
+  if(state.people.some(p=>p.toLowerCase()===name.toLowerCase())){ toast("That name's already in"); return; }
+  state.people.push(name);
+  inp.value = "";
+  inp.focus();
+  render();
+}
+
+function removePerson(p){
+  state.people = state.people.filter(x=>x!==p);
+  state.splitSel = state.splitSel.filter(x=>x!==p);
+  // expenses referencing removed payer stay but won't compute; clean splits
+  state.expenses.forEach(ex=> ex.split = ex.split.filter(x=>x!==p));
+  render();
+}
+
+function addExpense(){
+  const desc = $("expDesc").value.trim();
+  const amount = parseFloat($("expAmount").value);
+  const payer = $("expPayer").value;
+  if(!payer){ toast("Who paid?"); return; }
+  if(!(amount>0)){ toast("Enter an amount"); return; }
+  let split;
+  if(state.splitMode==="all"){ split = [...state.people]; }
+  else {
+    split = state.splitSel.filter(p=>state.people.includes(p));
+    if(split.length===0){ toast("Pick who to split between"); return; }
+  }
+  state.expenses.push({ id:Date.now()+""+Math.random().toString(36).slice(2,6), desc, amount, payer, split });
+  // reset form lightly
+  $("expDesc").value = "";
+  $("expAmount").value = "";
+  state.splitMode = "all";
+  state.splitSel = [];
+  render();
+  toast("Added");
+}
+
+function removeExpense(id){
+  state.expenses = state.expenses.filter(e=>e.id!==id);
+  render();
+}
+
+// ---------- utils ----------
+function esc(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+let toastT;
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+
+// ---------- wire up ----------
+function init(){
+  load();
+  render();
+
+  $("addPersonBtn").onclick = addPerson;
+  $("personInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addPerson(); });
+
+  $("tripName").addEventListener("input", e=>{ state.name = e.target.value; save(); });
+
+  $("splitAllBtn").onclick = ()=>{ state.splitMode="all"; renderSplitPeople(); };
+  $("splitSomeBtn").onclick = ()=>{
+    state.splitMode="some";
+    if(state.splitSel.length===0) state.splitSel=[...state.people];
+    renderSplitPeople();
+  };
+  $("addExpenseBtn").onclick = addExpense;
+  $("expAmount").addEventListener("keydown", e=>{ if(e.key==="Enter") addExpense(); });
+
+  // reset
+  $("resetBtn").onclick = ()=> $("resetModal").classList.add("show");
+  $("resetCancel").onclick = ()=> $("resetModal").classList.remove("show");
+  $("resetConfirm").onclick = ()=>{
+    state = blank();
+    save(); render();
+    $("resetModal").classList.remove("show");
+    toast("Cleared — fresh start");
+  };
+
+  // share
+  $("shareBtn").onclick = ()=>{
+    $("shareBox").value = shareLink();
+    $("shareModal").classList.add("show");
+  };
+  $("shareClose").onclick = ()=> $("shareModal").classList.remove("show");
+  $("copyLinkBtn").onclick = async ()=>{
+    const link = shareLink();
+    try{
+      if(navigator.share){ await navigator.share({title:"Tally", url:link}); }
+      else { await navigator.clipboard.writeText(link); toast("Link copied"); }
+    }catch(e){
+      $("shareBox").select(); document.execCommand("copy"); toast("Link copied");
+    }
+  };
+  $("loadPasteBtn").onclick = ()=>{
+    const v = prompt("Paste the shared link here:");
+    if(!v) return;
+    const idx = v.indexOf("#d=");
+    const payload = idx>=0 ? v.slice(idx+3) : v.trim();
+    const loaded = decodeState(payload);
+    if(!loaded){ toast("Couldn't read that link"); return; }
+    state = loaded;
+    save(); render();
+    $("shareModal").classList.remove("show");
+    toast("Loaded");
+  };
+
+  // close modals on backdrop tap
+  [$("resetModal"),$("shareModal")].forEach(m=>{
+    m.addEventListener("click", e=>{ if(e.target===m) m.classList.remove("show"); });
+  });
+}
+
+init();
+</script>
+</body>
+</html>

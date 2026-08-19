@@ -4,158 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0f1410">
-<title>Tally — split the bill</title>
+<title>Tally — split the bill, any currency</title>
 <style>
   :root{
-    --bg:#0f1410;
-    --surface:#171f18;
-    --surface-2:#1f2a20;
-    --ink:#eef2ec;
-    --ink-dim:#9aa89a;
-    --ink-faint:#5e6e5e;
-    --line:#2a382b;
-    --acc:#7dd97a;
-    --acc-deep:#4faf57;
-    --owe:#f0a868;
-    --get:#7dd97a;
-    --danger:#e2725b;
-    --r:14px;
-    --tap:48px;
+    --bg:#0f1410; --surface:#171f18; --surface-2:#1f2a20;
+    --ink:#eef2ec; --ink-dim:#9aa89a; --ink-faint:#5e6e5e; --line:#2a382b;
+    --acc:#7dd97a; --acc-deep:#4faf57; --owe:#f0a868; --get:#7dd97a; --danger:#e2725b;
+    --warn:#d9c37d; --r:14px; --tap:48px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
   body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    line-height:1.45;
+    background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.45;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     -webkit-font-smoothing:antialiased;
   }
   .wrap{max-width:520px;margin:0 auto;padding:18px 16px 120px}
 
-  /* ---- header ---- */
-  header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
-  .brand{font-size:1.55rem;font-weight:800;letter-spacing:-.02em;display:flex;align-items:baseline;gap:8px}
+  header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;gap:10px}
+  .brand{font-size:1.55rem;font-weight:800;letter-spacing:-.02em;display:flex;align-items:baseline;gap:8px;flex:none}
   .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--acc);display:inline-block;transform:translateY(-2px)}
   .trip-name{
-    background:none;border:none;color:var(--ink-dim);font-size:.95rem;font-weight:600;
-    text-align:right;padding:6px 4px;max-width:170px;font-family:inherit;
-    border-bottom:1px dashed transparent;
+    background:none;border:none;color:var(--ink-dim);font-size:.95rem;font-weight:600;text-align:right;
+    padding:6px 4px;flex:1;min-width:0;font-family:inherit;border-bottom:1px dashed transparent;
   }
   .trip-name:focus{outline:none;border-bottom-color:var(--line);color:var(--ink)}
 
-  /* ---- summary band ---- */
+  /* settling currency bar */
+  .settle-bar{
+    display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);
+    border-radius:11px;padding:9px 12px;margin:12px 0 4px;
+  }
+  .settle-bar .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);font-weight:700;flex:1}
+  .settle-bar select{width:auto;min-width:150px;height:40px}
+
+  .rate-note{font-size:.72rem;color:var(--ink-faint);margin:6px 4px 0;display:flex;align-items:center;gap:6px}
+  .rate-note .rbtn{background:none;border:none;color:var(--acc);font-size:.72rem;font-weight:700;cursor:pointer;padding:2px 4px;text-decoration:underline}
+  .rate-note.stale{color:var(--warn)}
+
   .summary{
-    background:linear-gradient(160deg,var(--surface-2),var(--surface));
-    border:1px solid var(--line);border-radius:var(--r);
-    padding:16px;margin:14px 0 22px;
+    background:linear-gradient(160deg,var(--surface-2),var(--surface));border:1px solid var(--line);
+    border-radius:var(--r);padding:16px;margin:14px 0 22px;
   }
   .summary .total-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);font-weight:700}
   .summary .total{font-size:2.1rem;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+  .summary .total .cur{font-size:1.1rem;color:var(--ink-dim);font-weight:700;margin-left:6px}
   .summary .meta{font-size:.82rem;color:var(--ink-dim);margin-top:2px}
 
-  /* ---- section heads ---- */
-  .sec-head{
-    display:flex;align-items:center;gap:10px;margin:24px 2px 12px;
-  }
+  .sec-head{display:flex;align-items:center;gap:10px;margin:24px 2px 12px}
   .sec-head h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-dim);margin:0;font-weight:700}
   .sec-head .rule{flex:1;height:1px;background:var(--line)}
   .count{font-size:.72rem;color:var(--ink-faint);background:var(--surface);padding:1px 8px;border-radius:20px;border:1px solid var(--line)}
 
-  /* ---- people chips ---- */
   .people{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{
-    display:inline-flex;align-items:center;gap:7px;background:var(--surface);
-    border:1px solid var(--line);border-radius:30px;padding:7px 8px 7px 13px;
-    font-size:.9rem;font-weight:600;
-  }
-  .chip .x{
-    width:22px;height:22px;border-radius:50%;border:none;background:var(--surface-2);
-    color:var(--ink-faint);font-size:1rem;line-height:1;cursor:pointer;display:grid;place-items:center;
-  }
+  .chip{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);
+    border-radius:30px;padding:7px 8px 7px 13px;font-size:.9rem;font-weight:600}
+  .chip .x{width:22px;height:22px;border-radius:50%;border:none;background:var(--surface-2);color:var(--ink-faint);
+    font-size:1rem;line-height:1;cursor:pointer;display:grid;place-items:center}
   .chip .x:hover{background:var(--danger);color:#fff}
-  .add-person{
-    display:flex;gap:8px;margin-top:12px;
-  }
+  .add-person{display:flex;gap:8px;margin-top:12px}
   .add-person input{flex:1}
 
-  /* ---- inputs ---- */
   input[type=text],input[type=number],select{
-    width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);
-    border-radius:11px;padding:0 14px;height:var(--tap);font-size:1rem;font-family:inherit;
-    appearance:none;
+    width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:11px;
+    padding:0 14px;height:var(--tap);font-size:1rem;font-family:inherit;appearance:none;
   }
   input::placeholder{color:var(--ink-faint)}
   input:focus,select:focus{outline:none;border-color:var(--acc-deep);background:var(--surface-2)}
   select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239aa89a' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
   label.fld{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);font-weight:700;margin:0 0 5px 3px}
 
-  /* ---- buttons ---- */
   button{font-family:inherit}
-  .btn{
-    height:var(--tap);border:none;border-radius:11px;background:var(--acc);color:#0c1a0c;
-    font-weight:700;font-size:.95rem;cursor:pointer;padding:0 18px;display:inline-flex;
-    align-items:center;justify-content:center;gap:8px;
-  }
+  .btn{height:var(--tap);border:none;border-radius:11px;background:var(--acc);color:#0c1a0c;font-weight:700;
+    font-size:.95rem;cursor:pointer;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
   .btn:active{transform:translateY(1px)}
   .btn.full{width:100%}
   .btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
   .btn.icon{width:var(--tap);padding:0;flex:none;font-size:1.4rem}
 
-  /* ---- expense form card ---- */
   .form-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
   .row{display:flex;gap:10px;margin-bottom:12px}
   .row > *{flex:1}
   .row.tight{margin-bottom:0}
+  .amt-cur{display:flex;gap:8px}
+  .amt-cur input{flex:1.3}
+  .amt-cur select{flex:1;min-width:96px}
+  .conv-hint{font-size:.75rem;color:var(--ink-faint);margin:-4px 3px 12px;min-height:1em}
+  .conv-hint b{color:var(--ink-dim);font-weight:700}
   .split-toggle{display:flex;gap:6px;margin:2px 0 12px}
-  .split-toggle button{
-    flex:1;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);
-    color:var(--ink-dim);font-size:.82rem;font-weight:600;cursor:pointer;
-  }
+  .split-toggle button{flex:1;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);
+    color:var(--ink-dim);font-size:.82rem;font-weight:600;cursor:pointer}
   .split-toggle button.on{background:var(--acc-deep);color:#fff;border-color:var(--acc-deep)}
   .split-people{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-  .sp{
-    font-size:.85rem;padding:6px 12px;border-radius:20px;border:1px solid var(--line);
-    background:var(--surface-2);color:var(--ink-faint);cursor:pointer;user-select:none;font-weight:600;
-  }
+  .sp{font-size:.85rem;padding:6px 12px;border-radius:20px;border:1px solid var(--line);background:var(--surface-2);
+    color:var(--ink-faint);cursor:pointer;user-select:none;font-weight:600}
   .sp.on{background:rgba(125,217,122,.14);color:var(--acc);border-color:var(--acc-deep)}
 
-  /* ---- expense list ---- */
-  .exp{
-    display:flex;align-items:center;gap:13px;background:var(--surface);
-    border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;
-  }
-  .exp .av{
-    width:38px;height:38px;border-radius:10px;background:var(--surface-2);color:var(--acc);
-    display:grid;place-items:center;font-weight:700;font-size:.95rem;flex:none;
-  }
+  .exp{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;margin-bottom:9px}
+  .exp .av{width:38px;height:38px;border-radius:10px;background:var(--surface-2);color:var(--acc);display:grid;
+    place-items:center;font-weight:700;font-size:.95rem;flex:none}
   .exp .body{flex:1;min-width:0}
   .exp .ttl{font-weight:600;font-size:.97rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .exp .sub{font-size:.78rem;color:var(--ink-dim);margin-top:1px}
-  .exp .amt{font-weight:700;font-size:1rem;flex:none}
-  .exp .del{
-    width:30px;height:30px;border-radius:8px;border:none;background:transparent;color:var(--ink-faint);
-    cursor:pointer;flex:none;font-size:1.1rem;
-  }
+  .exp .amt{font-weight:700;font-size:1rem;flex:none;text-align:right;white-space:nowrap}
+  .exp .amt .conv{display:block;font-size:.72rem;color:var(--ink-faint);font-weight:600}
+  .exp .del{width:30px;height:30px;border-radius:8px;border:none;background:transparent;color:var(--ink-faint);
+    cursor:pointer;flex:none;font-size:1.1rem}
   .exp .del:hover{background:var(--danger);color:#fff}
 
-  /* ---- settlement ---- */
-  .settle{
-    display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:12px;
-    background:var(--surface);border:1px solid var(--line);margin-bottom:9px;
-  }
+  .settle{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:12px;background:var(--surface);
+    border:1px solid var(--line);margin-bottom:9px}
   .settle .who{font-weight:700}
   .settle .arrow{color:var(--ink-faint);flex:1;display:flex;align-items:center;gap:8px;font-size:.9rem}
   .settle .arrow svg{flex:none}
-  .settle .sum{font-weight:800;color:var(--owe);font-size:1.02rem}
-  .all-square{
-    text-align:center;padding:26px 16px;color:var(--ink-dim);background:var(--surface);
-    border:1px dashed var(--line);border-radius:12px;font-size:.95rem;
-  }
+  .settle .sum{font-weight:800;color:var(--owe);font-size:1.02rem;white-space:nowrap}
+  .all-square{text-align:center;padding:26px 16px;color:var(--ink-dim);background:var(--surface);border:1px dashed var(--line);
+    border-radius:12px;font-size:.95rem}
   .all-square .big{font-size:1.6rem;margin-bottom:4px}
 
-  /* ---- balances mini ---- */
   .bal{display:flex;justify-content:space-between;padding:9px 13px;font-size:.9rem;border-bottom:1px solid var(--line)}
   .bal:last-child{border-bottom:none}
   .bal .pos{color:var(--get);font-weight:700}
@@ -163,40 +131,31 @@
   .bal .zero{color:var(--ink-faint);font-weight:600}
   .bal-wrap{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 
-  /* ---- empty states ---- */
   .empty{color:var(--ink-faint);font-size:.9rem;text-align:center;padding:18px}
 
-  /* ---- footer actions ---- */
   .foot{display:flex;gap:10px;margin-top:30px}
   .foot .btn{flex:1;font-size:.85rem}
 
-  /* ---- toast ---- */
-  .toast{
-    position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
     background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:30px;font-size:.88rem;font-weight:600;
-    opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.4);max-width:90vw;text-align:center;
-  }
+    opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.4);max-width:90vw;text-align:center}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  /* ---- modal ---- */
-  .modal-bg{
-    position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);
-    display:none;align-items:center;justify-content:center;padding:24px;z-index:60;
-  }
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);display:none;
+    align-items:center;justify-content:center;padding:24px;z-index:60}
   .modal-bg.show{display:flex}
-  .modal{
-    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;
-    max-width:420px;width:100%;
-  }
+  .modal{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;max-width:420px;width:100%}
   .modal h3{margin:0 0 6px;font-size:1.1rem}
   .modal p{margin:0 0 16px;color:var(--ink-dim);font-size:.9rem}
   .modal .acts{display:flex;gap:10px}
   .modal .acts .btn{flex:1}
-  .share-box{
-    width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink-dim);
+  .share-box{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink-dim);
     font-size:.78rem;padding:11px;font-family:ui-monospace,monospace;word-break:break-all;margin-bottom:14px;
-    max-height:120px;overflow:auto;resize:none;
-  }
+    max-height:120px;overflow:auto;resize:none}
+  .rate-edit-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:.9rem}
+  .rate-edit-row .code{width:52px;font-weight:700;color:var(--ink-dim)}
+  .rate-edit-row input{flex:1}
+  .rate-edit-list{max-height:280px;overflow:auto;margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -207,9 +166,15 @@
     <input class="trip-name" id="tripName" placeholder="Name this split" maxlength="28">
   </header>
 
+  <div class="settle-bar">
+    <span class="lbl">Settle up in</span>
+    <select id="settleCur"></select>
+  </div>
+  <div class="rate-note" id="rateNote"></div>
+
   <div class="summary">
     <div class="total-label">Total spent</div>
-    <div class="total" id="grandTotal">0.00</div>
+    <div class="total"><span id="grandTotal">0.00</span><span class="cur" id="grandCur">RSD</span></div>
     <div class="meta" id="summaryMeta">Add people, then start logging expenses</div>
   </div>
 
@@ -223,17 +188,17 @@
 
   <!-- ADD EXPENSE -->
   <div class="sec-head"><h2>Add expense</h2><div class="rule"></div></div>
-  <div class="form-card" id="expenseForm">
+  <div class="form-card">
     <div class="row tight" style="margin-bottom:12px">
       <input type="text" id="expDesc" placeholder="What was it for?" maxlength="40">
     </div>
-    <div class="row">
-      <div style="flex:1.1">
-        <input type="number" id="expAmount" placeholder="0.00" inputmode="decimal" step="0.01" min="0">
-      </div>
-      <div style="flex:1.4">
-        <select id="expPayer"><option value="">Paid by…</option></select>
-      </div>
+    <div class="amt-cur" style="margin-bottom:6px">
+      <input type="number" id="expAmount" placeholder="0.00" inputmode="decimal" step="0.01" min="0">
+      <select id="expCur"></select>
+    </div>
+    <div class="conv-hint" id="convHint"></div>
+    <div class="row" style="margin-bottom:12px">
+      <select id="expPayer"><option value="">Paid by…</option></select>
     </div>
     <label class="fld">Split between</label>
     <div class="split-toggle">
@@ -261,7 +226,6 @@
     <button class="btn ghost" id="shareBtn">↗ Share / Backup</button>
     <button class="btn ghost" id="resetBtn" style="color:var(--danger)">↺ Reset</button>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
@@ -282,7 +246,7 @@
 <div class="modal-bg" id="shareModal">
   <div class="modal">
     <h3>Share or back up</h3>
-    <p>Copy this link to open the same tally on another device, or paste a link someone sent you.</p>
+    <p>Copy this link to open the same tally on another device, or paste a link someone sent you. Cached rates travel with it.</p>
     <textarea class="share-box" id="shareBox" readonly rows="3"></textarea>
     <div class="acts" style="margin-bottom:10px">
       <button class="btn" id="copyLinkBtn">Copy link</button>
@@ -294,36 +258,69 @@
   </div>
 </div>
 
+<!-- RATE EDIT MODAL -->
+<div class="modal-bg" id="rateModal">
+  <div class="modal">
+    <h3>Exchange rates</h3>
+    <p id="rateModalSub">Rates are per 1 unit into <b id="rateBaseLbl">RSD</b>. Edit any by hand — your value sticks until you refresh.</p>
+    <div class="rate-edit-list" id="rateEditList"></div>
+    <div class="acts" style="margin-bottom:10px">
+      <button class="btn" id="rateRefreshBtn">↻ Fetch latest</button>
+      <button class="btn ghost" id="rateSaveBtn">Done</button>
+    </div>
+  </div>
+</div>
+
 <script>
 "use strict";
 
-// ---------- state ----------
-const KEY = "tally.v1";
-let state = { name:"", people:[], expenses:[], splitMode:"all", splitSel:[] };
+// ---------- currency set ----------
+const CURRENCIES = [
+  ["EUR","Euro"],["RSD","Serbian dinar"],["GBP","British pound"],["CHF","Swiss franc"],
+  ["PLN","Polish złoty"],["CZK","Czech koruna"],["HUF","Hungarian forint"],["RON","Romanian leu"],
+  ["BGN","Bulgarian lev"],["BAM","Bosnian mark"],["MKD","Macedonian denar"],["ALL","Albanian lek"],
+  ["HRK","Croatian kuna"],["SEK","Swedish krona"],["DKK","Danish krone"],["NOK","Norwegian krone"]
+];
+const CUR_CODES = CURRENCIES.map(c=>c[0]);
+const CUR_LOWER = CUR_CODES.map(c=>c.toLowerCase());
 
-function blank(){ return { name:"", people:[], expenses:[], splitMode:"all", splitSel:[] }; }
+// ---------- state ----------
+const KEY = "tally.v2";
+function blank(){
+  return {
+    name:"", people:[], expenses:[],
+    settleCur:"RSD",
+    splitMode:"all", splitSel:[],
+    lastExpCur:"EUR",
+    // rates: base code -> { date, fetchedAt, r:{code:rateFromBase} }
+    rates:{}
+  };
+}
+let state = blank();
 
 // ---------- persistence ----------
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 function load(){
-  // URL takes priority (incoming share link)
   const fromUrl = readHash();
   if(fromUrl){ state = fromUrl; save(); history.replaceState(null,"",location.pathname); return; }
   try{
     const raw = localStorage.getItem(KEY);
-    if(raw){ state = Object.assign(blank(), JSON.parse(raw)); }
+    if(raw) state = Object.assign(blank(), JSON.parse(raw));
   }catch(e){ state = blank(); }
 }
 
 // ---------- share encoding ----------
 function encodeState(s){
-  const json = JSON.stringify({n:s.name,p:s.people,e:s.expenses});
+  const json = JSON.stringify({n:s.name,p:s.people,e:s.expenses,sc:s.settleCur,rt:s.rates});
   return btoa(unescape(encodeURIComponent(json)));
 }
 function decodeState(str){
   try{
     const o = JSON.parse(decodeURIComponent(escape(atob(str))));
-    return Object.assign(blank(), { name:o.n||"", people:o.p||[], expenses:o.e||[] });
+    const s = blank();
+    s.name=o.n||""; s.people=o.p||[]; s.expenses=o.e||[];
+    s.settleCur=o.sc||"RSD"; s.rates=o.rt||{};
+    return s;
   }catch(e){ return null; }
 }
 function readHash(){
@@ -333,41 +330,110 @@ function readHash(){
 }
 function shareLink(){ return location.origin + location.pathname + "#d=" + encodeState(state); }
 
+// ---------- rate handling ----------
+// We store one rate table keyed by the settling currency as base.
+// rate table maps a source currency -> how many units of settleCur per 1 source unit.
+const RATE_TTL = 1000*60*60*12; // consider stale after 12h
+
+function rateTable(){ return state.rates[state.settleCur]; }
+
+function isStale(){
+  const t = rateTable();
+  if(!t || !t.fetchedAt) return true;
+  return (Date.now() - t.fetchedAt) > RATE_TTL;
+}
+
+function rateFor(code){
+  if(code === state.settleCur) return 1;
+  const t = rateTable();
+  if(t && t.r && typeof t.r[code] === "number") return t.r[code];
+  return null; // unknown
+}
+
+// convert amount from `code` into settling currency
+function toSettle(amount, code){
+  const r = rateFor(code);
+  if(r === null) return null;
+  return amount * r;
+}
+
+async function fetchRates(){
+  const base = state.settleCur.toLowerCase();
+  const primary = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${base}.min.json`;
+  const fallback = `https://latest.currency-api.pages.dev/v1/currencies/${base}.min.json`;
+  let data = null;
+  for(const url of [primary, fallback]){
+    try{
+      const res = await fetch(url, {cache:"no-store"});
+      if(res.ok){ data = await res.json(); break; }
+    }catch(e){ /* try next */ }
+  }
+  if(!data || !data[base]) return false;
+  const src = data[base];
+  const r = {};
+  CUR_CODES.forEach(code=>{
+    const v = src[code.toLowerCase()];
+    if(typeof v === "number" && v>0) r[code] = 1/v; // src is (code per 1 base); we want base per 1 code
+  });
+  r[state.settleCur] = 1;
+  state.rates[state.settleCur] = { date:data.date||"", fetchedAt:Date.now(), r };
+  save();
+  return true;
+}
+
+async function ensureRates(force){
+  if(!force && !isStale()) return true;
+  toast(isStale()?"Updating rates…":"Fetching rates…");
+  const ok = await fetchRates();
+  if(ok) toast("Rates updated");
+  else toast(rateTable()?"Offline — using saved rates":"No rates yet — set them by hand");
+  render();
+  return ok;
+}
+
 // ---------- money helpers ----------
 const fmt = n => (Math.round(n*100)/100).toFixed(2);
+const fmtInt = n => Math.round(n).toLocaleString();
+function money(n){ // whole-number currencies (RSD, HUF, etc.) read better without decimals when large
+  if(n>=1000) return fmtInt(n);
+  return fmt(n);
+}
 const initials = name => name.trim().slice(0,2).toUpperCase();
 
-// ---------- compute balances + settlements ----------
+// ---------- compute (all math done in settling currency) ----------
+function expenseInSettle(ex){ return toSettle(ex.amount, ex.cur); }
+
 function computeBalances(){
   const bal = {};
   state.people.forEach(p => bal[p] = 0);
-  state.expenses.forEach(ex => {
-    const parts = ex.split.filter(p => bal.hasOwnProperty(p));
-    if(parts.length === 0 || !bal.hasOwnProperty(ex.payer)) return;
-    const share = ex.amount / parts.length;
-    bal[ex.payer] += ex.amount;
-    parts.forEach(p => bal[p] -= share);
+  let missing = false;
+  state.expenses.forEach(ex=>{
+    const parts = ex.split.filter(p=>bal.hasOwnProperty(p));
+    if(parts.length===0 || !bal.hasOwnProperty(ex.payer)) return;
+    const val = expenseInSettle(ex);
+    if(val === null){ missing = true; return; }
+    const share = val/parts.length;
+    bal[ex.payer] += val;
+    parts.forEach(p=>bal[p]-=share);
   });
-  return bal;
+  return {bal, missing};
 }
 
 function simplifyDebts(bal){
-  const creditors = [], debtors = [];
+  const creditors=[], debtors=[];
   Object.entries(bal).forEach(([p,v])=>{
     const r = Math.round(v*100)/100;
-    if(r > 0.005) creditors.push({p,v:r});
-    else if(r < -0.005) debtors.push({p,v:-r});
+    if(r>0.005) creditors.push({p,v:r});
+    else if(r<-0.005) debtors.push({p,v:-r});
   });
-  creditors.sort((a,b)=>b.v-a.v);
-  debtors.sort((a,b)=>b.v-a.v);
-  const out=[];
-  let i=0,j=0;
+  creditors.sort((a,b)=>b.v-a.v); debtors.sort((a,b)=>b.v-a.v);
+  const out=[]; let i=0,j=0;
   while(i<debtors.length && j<creditors.length){
     const pay = Math.min(debtors[i].v, creditors[j].v);
     out.push({from:debtors[i].p, to:creditors[j].p, amount:pay});
-    debtors[i].v -= pay; creditors[j].v -= pay;
-    if(debtors[i].v < 0.005) i++;
-    if(creditors[j].v < 0.005) j++;
+    debtors[i].v-=pay; creditors[j].v-=pay;
+    if(debtors[i].v<0.005) i++;
+    if(creditors[j].v<0.005) j++;
   }
   return out;
 }
@@ -375,18 +441,35 @@ function simplifyDebts(bal){
 // ---------- rendering ----------
 const $ = id => document.getElementById(id);
 
-function render(){
-  // trip name
-  if($("tripName").value !== state.name) $("tripName").value = state.name;
+function fillCurSelect(sel, val){
+  sel.innerHTML = CURRENCIES.map(([c,n])=>`<option value="${c}">${c} — ${n}</option>`).join("");
+  sel.value = val;
+}
 
-  // totals
-  const total = state.expenses.reduce((s,e)=>s+e.amount,0);
-  $("grandTotal").textContent = fmt(total);
+function render(){
+  if($("tripName").value !== state.name) $("tripName").value = state.name;
+  $("settleCur").value = state.settleCur;
+  $("grandCur").textContent = state.settleCur;
+
+  renderRateNote();
+
+  // totals in settling currency
+  let total = 0, anyMissing = false;
+  state.expenses.forEach(ex=>{
+    const v = expenseInSettle(ex);
+    if(v===null) anyMissing = true; else total += v;
+  });
+  $("grandTotal").textContent = money(total);
+
   const np = state.people.length, ne = state.expenses.length;
-  $("summaryMeta").textContent =
-    ne===0 ? (np===0 ? "Add people, then start logging expenses"
-                     : `${np} ${np===1?"person":"people"} · no expenses yet`)
-           : `${ne} ${ne===1?"expense":"expenses"} · ${np} ${np===1?"person":"people"} · ${fmt(total/np)} avg pp`;
+  let meta;
+  if(ne===0) meta = (np===0?"Add people, then start logging expenses":`${np} ${np===1?"person":"people"} · no expenses yet`);
+  else{
+    meta = `${ne} ${ne===1?"expense":"expenses"} · ${np} ${np===1?"person":"people"}`;
+    if(np>0) meta += ` · ${money(total/np)} ${state.settleCur} pp`;
+    if(anyMissing) meta += " · some rates missing";
+  }
+  $("summaryMeta").textContent = meta;
 
   renderPeople();
   renderPayerOptions();
@@ -394,17 +477,41 @@ function render(){
   renderExpenses();
   renderSettlements();
   renderBalances();
+  renderConvHint();
   save();
+}
+
+function renderRateNote(){
+  const n = $("rateNote");
+  const t = rateTable();
+  if(!t){
+    n.className = "rate-note stale";
+    n.innerHTML = `No rates for ${state.settleCur} yet. <button class="rbtn" id="rnFetch">Fetch now</button> or <button class="rbtn" id="rnEdit">set by hand</button>`;
+  } else {
+    const when = t.fetchedAt ? timeAgo(t.fetchedAt) : "unknown";
+    const stale = isStale();
+    n.className = "rate-note" + (stale?" stale":"");
+    n.innerHTML = `Rates ${stale?"may be old":"current"} · updated ${when} `
+      + `<button class="rbtn" id="rnFetch">refresh</button> · `
+      + `<button class="rbtn" id="rnEdit">edit rates</button>`;
+  }
+  const f = $("rnFetch"), e = $("rnEdit");
+  if(f) f.onclick = ()=> ensureRates(true);
+  if(e) e.onclick = openRateModal;
+}
+
+function timeAgo(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return "just now";
+  const m = Math.floor(s/60); if(m<60) return m+"m ago";
+  const h = Math.floor(m/60); if(h<24) return h+"h ago";
+  const d = Math.floor(h/24); return d+"d ago";
 }
 
 function renderPeople(){
   $("peopleCount").textContent = state.people.length;
-  const c = $("peopleList");
-  c.innerHTML = "";
-  if(state.people.length === 0){
-    c.innerHTML = '<div class="empty">No one yet. Add the people splitting costs.</div>';
-    return;
-  }
+  const c = $("peopleList"); c.innerHTML = "";
+  if(state.people.length===0){ c.innerHTML = '<div class="empty">No one yet. Add the people splitting costs.</div>'; return; }
   state.people.forEach(p=>{
     const el = document.createElement("div");
     el.className = "chip";
@@ -415,8 +522,7 @@ function renderPeople(){
 }
 
 function renderPayerOptions(){
-  const sel = $("expPayer");
-  const cur = sel.value;
+  const sel = $("expPayer"); const cur = sel.value;
   sel.innerHTML = '<option value="">Paid by…</option>' +
     state.people.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");
   if(state.people.includes(cur)) sel.value = cur;
@@ -431,7 +537,7 @@ function renderSplitPeople(){
   c.innerHTML = "";
   state.people.forEach(p=>{
     const el = document.createElement("div");
-    el.className = "sp" + (state.splitSel.includes(p) ? " on":"");
+    el.className = "sp" + (state.splitSel.includes(p)?" on":"");
     el.textContent = p;
     el.onclick = ()=>{
       const i = state.splitSel.indexOf(p);
@@ -442,18 +548,28 @@ function renderSplitPeople(){
   });
 }
 
+function renderConvHint(){
+  const h = $("convHint");
+  const amt = parseFloat($("expAmount").value);
+  const cur = $("expCur").value;
+  if(!(amt>0) || !cur){ h.textContent=""; return; }
+  if(cur===state.settleCur){ h.textContent = "Already in your settling currency."; return; }
+  const v = toSettle(amt, cur);
+  if(v===null){ h.innerHTML = `No rate for ${cur}→${state.settleCur} yet — <b>fetch or set rates</b> to convert.`; return; }
+  h.innerHTML = `≈ <b>${money(v)} ${state.settleCur}</b> at current rate`;
+}
+
 function renderExpenses(){
   $("expCount").textContent = state.expenses.length;
-  const c = $("expenseList");
-  c.innerHTML = "";
-  if(state.expenses.length === 0){
-    c.innerHTML = '<div class="empty">No expenses logged yet.</div>';
-    return;
-  }
-  // newest first
+  const c = $("expenseList"); c.innerHTML = "";
+  if(state.expenses.length===0){ c.innerHTML = '<div class="empty">No expenses logged yet.</div>'; return; }
   [...state.expenses].reverse().forEach(ex=>{
     const everyone = ex.split.length === state.people.length;
-    const splitTxt = everyone ? "split evenly" : "split " + ex.split.length + " ways";
+    const splitTxt = everyone ? "split evenly" : "split "+ex.split.length+" ways";
+    const v = expenseInSettle(ex);
+    const convLine = (ex.cur===state.settleCur) ? "" :
+      (v===null ? `<span class="conv">no ${ex.cur}→${state.settleCur} rate</span>`
+                : `<span class="conv">≈ ${money(v)} ${state.settleCur}</span>`);
     const el = document.createElement("div");
     el.className = "exp";
     el.innerHTML = `
@@ -462,7 +578,7 @@ function renderExpenses(){
         <div class="ttl">${esc(ex.desc||"Expense")}</div>
         <div class="sub">${esc(ex.payer)} paid · ${splitTxt}</div>
       </div>
-      <div class="amt">${fmt(ex.amount)}</div>
+      <div class="amt">${money(ex.amount)} ${esc(ex.cur)}${convLine}</div>
       <button class="del" aria-label="Delete">🗑</button>`;
     el.querySelector(".del").onclick = ()=> removeExpense(ex.id);
     c.appendChild(el);
@@ -470,17 +586,21 @@ function renderExpenses(){
 }
 
 function renderSettlements(){
-  const c = $("settleList");
-  c.innerHTML = "";
-  const bal = computeBalances();
+  const c = $("settleList"); c.innerHTML = "";
+  if(state.expenses.length===0){ c.innerHTML = '<div class="empty">Settlements appear once there are expenses.</div>'; return; }
+  const {bal, missing} = computeBalances();
   const moves = simplifyDebts(bal);
-  if(state.expenses.length === 0){
-    c.innerHTML = '<div class="empty">Settlements appear once there are expenses.</div>';
-    return;
+  if(missing){
+    const warn = document.createElement("div");
+    warn.className = "empty"; warn.style.color = "var(--warn)";
+    warn.textContent = "Some expenses have no exchange rate yet, so they're left out below. Fetch or set rates to include them.";
+    c.appendChild(warn);
   }
-  if(moves.length === 0){
-    c.innerHTML = `<div class="all-square"><div class="big">✓</div>Everyone's square. Nothing owed.</div>`;
-    return;
+  if(moves.length===0){
+    const d = document.createElement("div");
+    d.className = "all-square";
+    d.innerHTML = `<div class="big">✓</div>Everyone's square. Nothing owed.`;
+    c.appendChild(d); return;
   }
   moves.forEach(m=>{
     const el = document.createElement("div");
@@ -491,20 +611,20 @@ function renderSettlements(){
         <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h17m0 0l-4-4m4 4l-4 4" stroke="#5e6e5e" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         ${esc(m.to)}
       </span>
-      <span class="sum">${fmt(m.amount)}</span>`;
+      <span class="sum">${money(m.amount)} ${state.settleCur}</span>`;
     c.appendChild(el);
   });
 }
 
 function renderBalances(){
-  const c = $("balanceList");
-  c.innerHTML = "";
-  if(state.people.length === 0){ c.innerHTML = '<div class="empty">—</div>'; return; }
-  const bal = computeBalances();
+  const c = $("balanceList"); c.innerHTML = "";
+  if(state.people.length===0){ c.innerHTML = '<div class="empty">—</div>'; return; }
+  const {bal} = computeBalances();
   state.people.forEach(p=>{
     const v = Math.round(bal[p]*100)/100;
     const cls = v>0.005?"pos":(v<-0.005?"neg":"zero");
-    const txt = v>0.005?`gets back ${fmt(v)}`:(v<-0.005?`owes ${fmt(-v)}`:`settled`);
+    const txt = v>0.005?`gets back ${money(v)} ${state.settleCur}`
+              :(v<-0.005?`owes ${money(-v)} ${state.settleCur}`:`settled`);
     const el = document.createElement("div");
     el.className = "bal";
     el.innerHTML = `<span>${esc(p)}</span><span class="${cls}">${txt}</span>`;
@@ -514,71 +634,103 @@ function renderBalances(){
 
 // ---------- actions ----------
 function addPerson(){
-  const inp = $("personInput");
-  const name = inp.value.trim();
+  const inp = $("personInput"); const name = inp.value.trim();
   if(!name) return;
   if(state.people.some(p=>p.toLowerCase()===name.toLowerCase())){ toast("That name's already in"); return; }
-  state.people.push(name);
-  inp.value = "";
-  inp.focus();
-  render();
+  state.people.push(name); inp.value=""; inp.focus(); render();
 }
-
 function removePerson(p){
   state.people = state.people.filter(x=>x!==p);
   state.splitSel = state.splitSel.filter(x=>x!==p);
-  // expenses referencing removed payer stay but won't compute; clean splits
   state.expenses.forEach(ex=> ex.split = ex.split.filter(x=>x!==p));
   render();
 }
-
 function addExpense(){
   const desc = $("expDesc").value.trim();
   const amount = parseFloat($("expAmount").value);
+  const cur = $("expCur").value;
   const payer = $("expPayer").value;
   if(!payer){ toast("Who paid?"); return; }
   if(!(amount>0)){ toast("Enter an amount"); return; }
+  if(!cur){ toast("Pick a currency"); return; }
   let split;
-  if(state.splitMode==="all"){ split = [...state.people]; }
-  else {
+  if(state.splitMode==="all"){ split=[...state.people]; }
+  else{
     split = state.splitSel.filter(p=>state.people.includes(p));
     if(split.length===0){ toast("Pick who to split between"); return; }
   }
-  state.expenses.push({ id:Date.now()+""+Math.random().toString(36).slice(2,6), desc, amount, payer, split });
-  // reset form lightly
-  $("expDesc").value = "";
-  $("expAmount").value = "";
-  state.splitMode = "all";
-  state.splitSel = [];
-  render();
-  toast("Added");
+  state.expenses.push({ id:Date.now()+""+Math.random().toString(36).slice(2,6), desc, amount, cur, payer, split });
+  state.lastExpCur = cur;
+  $("expDesc").value=""; $("expAmount").value="";
+  state.splitMode="all"; state.splitSel=[];
+  render(); toast("Added");
 }
+function removeExpense(id){ state.expenses = state.expenses.filter(e=>e.id!==id); render(); }
 
-function removeExpense(id){
-  state.expenses = state.expenses.filter(e=>e.id!==id);
-  render();
+// ---------- rate modal ----------
+function openRateModal(){
+  $("rateBaseLbl").textContent = state.settleCur;
+  const list = $("rateEditList"); list.innerHTML = "";
+  const t = rateTable();
+  CUR_CODES.filter(c=>c!==state.settleCur).forEach(code=>{
+    const val = (t && t.r && t.r[code]!=null) ? t.r[code] : "";
+    const row = document.createElement("div");
+    row.className = "rate-edit-row";
+    row.innerHTML = `<span class="code">${code}</span>
+      <input type="number" step="any" min="0" data-code="${code}" placeholder="—" value="${val!==""?fmtRate(val):""}">
+      <span style="color:var(--ink-faint);font-size:.8rem">${state.settleCur}</span>`;
+    list.appendChild(row);
+  });
+  $("rateModal").classList.add("show");
+}
+function fmtRate(v){ // show enough precision
+  if(v>=100) return (Math.round(v*100)/100).toString();
+  if(v>=1) return (Math.round(v*10000)/10000).toString();
+  return (Math.round(v*1000000)/1000000).toString();
+}
+function saveRateEdits(){
+  const t = state.rates[state.settleCur] || { date:"", fetchedAt:Date.now(), r:{} };
+  t.r = t.r || {};
+  $("rateEditList").querySelectorAll("input[data-code]").forEach(inp=>{
+    const code = inp.getAttribute("data-code");
+    const v = parseFloat(inp.value);
+    if(v>0) t.r[code] = v;
+  });
+  t.r[state.settleCur] = 1;
+  // mark as hand-set now so it isn't immediately "stale"
+  t.fetchedAt = Date.now();
+  t.date = t.date || "manual";
+  state.rates[state.settleCur] = t;
+  save(); render();
+  $("rateModal").classList.remove("show");
+  toast("Rates saved");
 }
 
 // ---------- utils ----------
 function esc(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 let toastT;
 function toast(msg){
-  const t = $("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(toastT);
-  toastT = setTimeout(()=>t.classList.remove("show"), 1800);
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 1900);
 }
 
-// ---------- wire up ----------
+// ---------- init ----------
 function init(){
   load();
+  fillCurSelect($("settleCur"), state.settleCur);
+  fillCurSelect($("expCur"), state.lastExpCur || "EUR");
   render();
 
   $("addPersonBtn").onclick = addPerson;
   $("personInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addPerson(); });
-
   $("tripName").addEventListener("input", e=>{ state.name = e.target.value; save(); });
+
+  $("settleCur").addEventListener("change", async e=>{
+    state.settleCur = e.target.value; save(); render();
+    await ensureRates(false); // fetch if we don't have this base yet or it's stale
+  });
+  $("expCur").addEventListener("change", ()=>{ state.lastExpCur = $("expCur").value; renderConvHint(); save(); });
+  $("expAmount").addEventListener("input", renderConvHint);
 
   $("splitAllBtn").onclick = ()=>{ state.splitMode="all"; renderSplitPeople(); };
   $("splitSomeBtn").onclick = ()=>{
@@ -593,26 +745,26 @@ function init(){
   $("resetBtn").onclick = ()=> $("resetModal").classList.add("show");
   $("resetCancel").onclick = ()=> $("resetModal").classList.remove("show");
   $("resetConfirm").onclick = ()=>{
+    const keepRates = state.rates; const keepSettle = state.settleCur;
     state = blank();
+    state.rates = keepRates;          // keep fetched rates across a reset — they're trip-agnostic
+    state.settleCur = keepSettle;
+    fillCurSelect($("settleCur"), state.settleCur);
+    fillCurSelect($("expCur"), "EUR");
     save(); render();
     $("resetModal").classList.remove("show");
     toast("Cleared — fresh start");
   };
 
   // share
-  $("shareBtn").onclick = ()=>{
-    $("shareBox").value = shareLink();
-    $("shareModal").classList.add("show");
-  };
+  $("shareBtn").onclick = ()=>{ $("shareBox").value = shareLink(); $("shareModal").classList.add("show"); };
   $("shareClose").onclick = ()=> $("shareModal").classList.remove("show");
   $("copyLinkBtn").onclick = async ()=>{
     const link = shareLink();
     try{
       if(navigator.share){ await navigator.share({title:"Tally", url:link}); }
       else { await navigator.clipboard.writeText(link); toast("Link copied"); }
-    }catch(e){
-      $("shareBox").select(); document.execCommand("copy"); toast("Link copied");
-    }
+    }catch(e){ $("shareBox").select(); document.execCommand("copy"); toast("Link copied"); }
   };
   $("loadPasteBtn").onclick = ()=>{
     const v = prompt("Paste the shared link here:");
@@ -622,15 +774,23 @@ function init(){
     const loaded = decodeState(payload);
     if(!loaded){ toast("Couldn't read that link"); return; }
     state = loaded;
+    fillCurSelect($("settleCur"), state.settleCur);
+    fillCurSelect($("expCur"), "EUR");
     save(); render();
     $("shareModal").classList.remove("show");
     toast("Loaded");
   };
 
-  // close modals on backdrop tap
-  [$("resetModal"),$("shareModal")].forEach(m=>{
+  // rate modal
+  $("rateRefreshBtn").onclick = async ()=>{ await ensureRates(true); openRateModal(); };
+  $("rateSaveBtn").onclick = saveRateEdits;
+
+  [$("resetModal"),$("shareModal"),$("rateModal")].forEach(m=>{
     m.addEventListener("click", e=>{ if(e.target===m) m.classList.remove("show"); });
   });
+
+  // on first load, try to get rates for the settling currency (non-blocking)
+  ensureRates(false);
 }
 
 init();

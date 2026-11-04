@@ -30,7 +30,27 @@
 
 		<script type="text/javascript">
 
-Highcharts.chart('container1', {
+		const names = ['oxymoron93 (GM)', 'swipenet', 'EddyMataGallos', 'shomman', 'V3L0C1T4', 'Thisguy248', 'Giant Joe', 'spertox81', 'Oleary15', 'getpucht', 'jp27ace', 'White Whale', 'xela', 'vector7', 'golfkid', 'Smartin8411', 'danielr', 'Jamza15', 'YaxMin', 'l8_Rabbit', 'dotone', 'kkstrong', 'Zapmeister', 'Gnarcissist', 'swaqbtzg', 'Jonnek', 'Ben Schultz', 'RenaldoLom', 'MucsBryh', 'Paradox', 'mohit_ghune', 'DJ_M', 'Kool', 'Wain', 'glupi_zmaj', 'Cfair', 'Martin1707', 'pzylL', 'shilo1122', 'BtoasterBoy', 'Crazyant', 'Dawiki', 'KoopaTroopa', 'LOLEEEPOP', 'Meta_Ing', 'N NinjaPro', 'Ngaged', 'Pai_Mei', 'Pheidippides', 'Polt', 'Snowtiger', 'SpartaX18', 'TheGoose', 'Viper N', 'aerodynamic', 'ally67', 'amomentlikethis', 'animalrights', 'daricque', 'ninja_matt', 'studwalker'];
+		const tiedData = [30, 9, 12, 11, 7, 21, 10, 9, 2, 3, 5, 2, 5, 6, 4, 5, 5, 4, 4, 1, 4, 4, 5, 2, 3, 2, 3, 3, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+		const pureData = [209, 93, 87, 69, 40, 24, 11, 8, 7, 6, 4, 6, 3, 2, 3, 2, 2, 2, 2, 4, 1, 1, 0, 2, 1, 1, 0, 0, 2, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+		const rows = names.map((name, i) => ({ name, tied: tiedData[i], pure: pureData[i] }));
+
+		function sortChart(chart) {
+			const [tiedS, pureS] = chart.series;
+			const score = r => (tiedS.visible ? r.tied : 0) + (pureS.visible ? r.pure : 0);
+
+			const sorted = rows.slice().sort((a, b) =>
+				score(b) - score(a) || (b.tied + b.pure) - (a.tied + a.pure)
+			);
+
+			chart.xAxis[0].setCategories(sorted.map(r => r.name), false);
+			tiedS.setData(sorted.map(r => r.tied), false, false, false);
+			pureS.setData(sorted.map(r => r.pure), false, false, false);
+			chart.redraw();
+		}
+
+		Highcharts.chart('container1', {
 	chart: {
 		type: 'column',
 		zoomType: 'xy'
@@ -39,14 +59,14 @@ Highcharts.chart('container1', {
 		text: '0ths rankings'
 	},
 	subtitle: {
-		text: 'As of Nov 4 2026'
+		text: 'As of Nov 6 2026'
 	},
 	xAxis: {
-		categories: ['oxymoron93 (GM)', 'swipenet', 'EddyMataGallos', 'shomman', 'V3L0C1T4', 'Thisguy248', 'Giant Joe', 'spertox81', 'Oleary15', 'getpucht', 'jp27ace', 'White Whale', 'xela', 'vector7', 'Smartin8411', 'danielr', 'l8_Rabbit', 'Jamza15', 'YaxMin', 'golfkid', 'dotone', 'kkstrong', 'Zapmeister', 'Gnarcissist', 'swaqbtzg', 'Jonnek', 'Ben Schultz', 'RenaldoLom', 'MucsBryh', 'Paradox', 'mohit_ghune', 'DJ_M', 'Kool', 'Wain', 'glupi_zmaj', 'Cfair', 'Martin1707', 'pzylL', 'shilo1122', 'BtoasterBoy', 'Crazyant', 'Dawiki', 'KoopaTroopa', 'LOLEEEPOP', 'Meta_Ing', 'N NinjaPro', 'Ngaged', 'Pai_Mei', 'Pheidippides', 'Polt', 'Snowtiger', 'SpartaX18', 'TheGoose', 'Viper N', 'aerodynamic', 'ally67', 'amomentlikethis', 'animalrights', 'daricque', 'ninja_matt', 'studwalker']
+		categories: names
 	},
 	yAxis: {
 		min: 0,
-		max: 250,
+		max: 249,
 		title: {
 			text: '0th count'
 		},
@@ -79,14 +99,24 @@ Highcharts.chart('container1', {
 			dataLabels: {
 				enabled: false
 			}
+		},
+		series: {
+			events: {
+				legendItemClick: function () {
+					const chart = this.chart;
+					this.setVisible(!this.visible, false);
+					sortChart(chart);
+					return false;
+				}
+			}
 		}
 	},
 	series: [{
 		name: 'Tied',
-		data: [30, 9, 12, 12, 7, 21, 10, 9, 2, 3, 5, 2, 5, 6, 5, 5, 1, 4, 4, 4, 4, 4, 5, 2, 3, 2, 3, 3, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+		data: tiedData
 	}, {
 		name: 'Pure',
-		data: [210, 93, 87, 69, 40, 24, 10, 8, 7, 6, 4, 6, 3, 2, 2, 2, 5, 2, 2, 2, 1, 1, 0, 2, 1, 1, 0, 0, 2, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		data: pureData
 	}]
 })
 		</script><hr>
@@ -108,26 +138,26 @@ Highcharts.chart('container2', {
 		name: '0ths',
 		keys: ['name', 'y', 'color', 'label'],
 		data: [
-			['oxymoron93', 210, '#BE3075'],
+			['oxymoron93', 209, '#BE3075'],
 			['swipenet',  93, '#EB001F'],
 			['EddyMataGallos',  87, '#64A12D'],
 			['shomman',  69, '#000000'],
 			['V3L0C1T4',  40, '#00DDEE'],
 			['Thisguy248',  24, '#008AC5'],
-			['Giant Joe',  10, '#a83232'],
+			['Giant Joe',  11, '#a83232'],
 			['spertox81',   8, '#005555'],
 			['Oleary15',   7, '#FFED00'],
 			['White Whale',   6, '#FFEDAA'],
 			['getpucht',   6, '#ABCDEF'],
-			['l8_Rabbit',   5, '#bb00bb'],
-			['jp27ace',   4, '#888888'],
-			['xela',   3, '#325ea8'],
-			['danielr',   2, '#9a32a8'],
-			['Smartin8411',   2, '#00aa00'],
-			['vector7',   2, '#a83277'],
-			['Jamza15',   2, '#32a85f'],
-			['YaxMin',   2, '#009EE0'],
-			['golfkid',   2, '#83a832'],
+			['jp27ace',   4, '#bb00bb'],
+			['l8_Rabbit',   4, '#888888'],
+			['golfkid',   3, '#325ea8'],
+			['xela',   3, '#9a32a8'],
+			['danielr',   2, '#00aa00'],
+			['Jamza15',   2, '#a83277'],
+			['YaxMin',   2, '#32a85f'],
+			['Smartin8411',   2, '#009EE0'],
+			['vector7',   2, '#83a832'],
 			['mohit_ghune',   2, '#BE3075'],
 			['Paradox',   2, '#EB001F'],
 			['MucsBryh',   2, '#64A12D'],
@@ -167,7 +197,7 @@ Highcharts.chart('container3', {
 		text: 'Top10s and Top5s rankings'
 	},
 	xAxis: {
-		categories: ['oxymoron93', 'shomman', 'EddyMataGallos', 'V3L0C1T4', 'Thisguy248', 'Gnarcissist', 'jp27ace', 'kkstrong', 'danielr', 'Oleary15', 'golfkid', 'White Whale', 'pzylL', 'swaqbtzg', 'xela', 'swipenet', 'natakial2', 'BtoasterBoy', 'getpucht', 'mohit_ghune']
+		categories: ['oxymoron93', 'shomman', 'EddyMataGallos', 'V3L0C1T4', 'Thisguy248', 'Gnarcissist', 'jp27ace', 'kkstrong', 'danielr', 'Oleary15', 'golfkid', 'White Whale', 'pzylL', 'swaqbtzg', 'xela', 'swipenet', 'natakial2', 'BtoasterBoy', 'getpucht', 'Giant Joe']
 	},
 	yAxis: {
 		min: 0,
@@ -207,10 +237,10 @@ Highcharts.chart('container3', {
 	},
 	series: [{
 		name: 'Non-top5s',
-		data: [52, 102, 133, 148, 137, 210, 202, 196, 133, 86, 62, 73, 91, 85, 68, 1, 82, 81, 55, 38]
+		data: [52, 101, 134, 148, 137, 212, 202, 196, 133, 86, 62, 73, 90, 87, 68, 1, 82, 81, 55, 36]
 	}, {
 		name: 'Top5s',
-		data: [522, 429, 366, 225, 197, 87, 77, 82, 67, 64, 86, 57, 27, 29, 42, 101, 18, 11, 35, 42]
+		data: [522, 429, 365, 225, 197, 85, 77, 82, 67, 64, 87, 57, 27, 29, 42, 101, 18, 11, 35, 44]
 	}]
 })
 		</script><hr>
@@ -268,25 +298,25 @@ Highcharts.chart('container4', {
 	},
 	series: [{
 		data: [
-			{ x: 574, y: 1.705575, z: 4761, name: 'oxymoron93' },
-			{ x: 531, y: 2.794727, z: 3826, name: 'shomman' },
-			{ x: 499, y: 2.941884, z: 3522, name: 'EddyMataGallos' },
-			{ x: 373, y: 3.890080, z: 2279, name: 'V3L0C1T4' },
-			{ x: 334, y: 3.910180, z: 2034, name: 'Thisguy248' },
-			{ x: 297, y: 5.656566, z: 1290, name: 'Gnarcissist' },
-			{ x: 278, y: 5.755396, z: 1180, name: 'kkstrong' },
-			{ x: 279, y: 5.896057, z: 1145, name: 'jp27ace' },
+			{ x: 574, y: 1.707317, z: 4760, name: 'oxymoron93' },
+			{ x: 530, y: 2.786792, z: 3823, name: 'shomman' },
+			{ x: 499, y: 2.953908, z: 3516, name: 'EddyMataGallos' },
+			{ x: 373, y: 3.892761, z: 2278, name: 'V3L0C1T4' },
+			{ x: 334, y: 3.913174, z: 2033, name: 'Thisguy248' },
+			{ x: 297, y: 5.666667, z: 1287, name: 'Gnarcissist' },
+			{ x: 278, y: 5.766187, z: 1177, name: 'kkstrong' },
+			{ x: 279, y: 5.899642, z: 1144, name: 'jp27ace' },
 			{ x: 102, y: 0.156863, z: 1004, name: 'swipenet' },
-			{ x: 200, y: 5.460000, z:  908, name: 'danielr' },
-			{ x: 148, y: 4.189189, z:  860, name: 'golfkid' },
-			{ x: 150, y: 4.806667, z:  779, name: 'Oleary15' },
+			{ x: 200, y: 5.465000, z:  907, name: 'danielr' },
+			{ x: 149, y: 4.161074, z:  870, name: 'golfkid' },
+			{ x: 150, y: 4.813333, z:  778, name: 'Oleary15' },
 			{ x: 130, y: 4.992308, z:  651, name: 'White Whale' },
 			{ x: 110, y: 5.436364, z:  502, name: 'xela' },
-			{ x: 114, y: 5.789474, z:  480, name: 'swaqbtzg' },
-			{ x:  79, y: 4.253165, z:  454, name: 'Giant Joe' },
-			{ x: 118, y: 6.161017, z:  453, name: 'pzylL' },
-			{ x:  80, y: 4.537500, z:  437, name: 'mohit_ghune' },
-			{ x:  90, y: 5.266667, z:  426, name: 'getpucht' },
+			{ x: 116, y: 5.793103, z:  488, name: 'swaqbtzg' },
+			{ x:  80, y: 4.200000, z:  464, name: 'Giant Joe' },
+			{ x: 117, y: 6.136752, z:  452, name: 'pzylL' },
+			{ x:  80, y: 4.550000, z:  436, name: 'mohit_ghune' },
+			{ x:  90, y: 5.288889, z:  424, name: 'getpucht' },
 			{ x:  55, y: 2.945455, z:  388, name: 'spertox81' },
 ]
 	}]
